@@ -1,0 +1,23 @@
+This document is a description of the scope language for claim requests.
+
+The OAuth2 specification, in https://tools.ietf.org/html/rfc6749#section-3.3 and we quote
+
+"The value of the scope parameter is expressed as a list of space-
+    delimited, case-sensitive strings.  The strings are defined by the
+    authorization server.  If the value contains multiple space-delimited
+    strings, their order does not matter, and each string adds an
+    additional access range to the requested scope."
+
+There is more in section 3.3, but the relevant point for us is that these are defined on the server and are interpreted
+    there, so we have a free hand in specifying them. The aim is to make a small claims language that in
+    effect allows each scope to be a specific request and be processed. This includes parameters for the
+    request.
+
+The most natural syntax will be a uri with various bits for a query. The query parameters are simply the
+mutable parts, e.g.
+
+scitokens:access:/read?path=/foo/bar/baz&location=https://bluewaters.ncsa.illinois.edu/
+
+so scitokens -- scopes it
+access -- what is requested
+various parameters relating to the request.

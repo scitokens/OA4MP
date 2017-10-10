@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>
-
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>edu.uiuc.ncsa.myproxy</groupId>
-    <artifactId>myproxy</artifactId>
-    <version>3.4-SNAPSHOT</version>
+    <groupId>org.scitokens</groupId>
+    <artifactId>scitokens-java</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Parent module for SciTokens.</name>
     <packaging>pom</packaging>
-    <name>Open Authorization for MyProxy</name>
-    <description>Open Authorization (OAuth) client and server code for MyProxy</description>
-    <url>http://grid.ncsa.illinois.edu/myproxy/oauth</url>
+    <description>SciTokens Java library.</description>
+    <url>http://scitokens.org</url>
+    <scm>
+        <developerConnection>
+            scm:git:https://github.com/scitokens
+        </developerConnection>
+        <connection>scm:git:https://github.com/scitokens
+        </connection>
+        <url>scm:git:https://github.com/scitokens</url>
+    </scm>
     <licenses>
         <license>
             <name>Apache license</name>
@@ -22,12 +29,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <scm>
-        <developerConnection>scm:svn:https://jeff92@svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy
-        </developerConnection>
-        <connection>scm:svn:https://jeff92@svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy</connection>
-        <url>scm:svn:https://jeff92@svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/myproxy</url>
-    </scm>
     <developers>
         <developer>
             <name>Jeff Gaynor</name>
@@ -38,39 +39,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <additionalparam>-Xdoclint:none</additionalparam>
     </properties>
-
-    <issueManagement>
-        <system>Jira</system>
-        <url>https://gateways.atlassian.net/browse/OAUTH</url>
-    </issueManagement>
-
     <modules>
-        <module>myproxy-logon</module>
-        <module>oa4mp-server-api</module>
-        <module>oa4mp-server-test</module>
-        <module>oa4mp-server-loader-oauth1</module>
-        <module>oa4mp-server-oauth1</module>
-        <module>oa4mp-server-loader-oauth2</module>
-        <module>oa4mp-server-oauth2</module>
-        <module>oa4mp-client-api</module>
-        <module>oa4mp-client-loader-oauth1</module>
-        <module>oa4mp-client-oauth1</module>
-        <module>oa4mp-client-loader-oauth2</module>
-        <module>oa4mp-client-oauth2</module>
-        <module>oa4mp-server-admin-oauth1</module>
-        <module>oa4mp-server-admin-oauth2</module>
-        <module>oa4mp-client-webapp</module>
-        <module>oa4mp-client-test</module>
-        <module>oa4mp-webapp</module>
-        <module>oa4mp-server-admin</module>
-        <module>oa4mp-xsede</module>
-        <module>oa4mp-xsede-oauth2</module>
-        <module>oa4mp-twofactor</module>
-        <module>oa4mp-oidc-twofactor</module>
-        <module>oa4mp-website</module>
-        <module>oa4mp-co-oidc</module>
-        <module>oa4mp-skin</module>
-        <module>myproxy-website</module>
+        <module>scitokens-common</module>
+        <module>scitokens-cli</module>
+        <module>scitokens-client</module>
+        <module>scitokens-server</module>
     </modules>
     <dependencies>
         <dependency>
@@ -80,20 +53,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <distributionManagement>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>sonatype</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2
-            </url>
-        </repository>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>sonatype</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
     <build>
         <plugins>
             <plugin>
@@ -104,6 +63,35 @@
                     <target>1.7</target>
                 </configuration>
                 <version>2.3.2</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>6.1.26</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.1</version>
+                <executions>
+                    <execution>
+                        <id>bundle-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <!-- produce source artifact for main project sources -->
+                            <goal>jar-no-fork</goal>
+
+                            <!-- produce source artifact for project test sources -->
+                            <goal>test-jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -122,23 +110,11 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.9.1</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -154,51 +130,23 @@
                 </executions>
 
             </plugin>
-            <!--     <plugin>
-                     <artifactId>maven-source-plugin</artifactId>
-                     <version>2.1.1</version>
-                     <executions>
-                         <execution>
-                             <id>bundle-sources</id>
-                             <phase>package</phase>
-                             <goals>
-                                 &lt;!&ndash; produce source artifact for main project sources &ndash;&gt;
-                                 <goal>jar-no-fork</goal>
 
-                                 &lt;!&ndash; produce source artifact for project test sources &ndash;&gt;
-                                 <goal>test-jar-no-fork</goal>
-                             </goals>
-                         </execution>
-                     </executions>
-                 </plugin>-->
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.26</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                    <use>false</use>
-                </configuration>
-            </plugin>
         </plugins>
+
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                    <use>false</use>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+    <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>sonatype</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/
+            </url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>sonatype</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
+
