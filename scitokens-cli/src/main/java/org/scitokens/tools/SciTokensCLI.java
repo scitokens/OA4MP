@@ -10,6 +10,8 @@ import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
 import org.apache.commons.lang.StringUtils;
 
 /**
+ * This creates SciTokens at the command line from the utilities and can verify them as well.
+ * It also will generate signing keys.
  * <p>Created by Jeff Gaynor<br>
  * on 9/5/17 at  3:31 PM
  */
@@ -61,7 +63,7 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
         say("list_keys");
         say("parse_claims");
         say("print_token");
-        say("To get a full explination of the command and its syntax, type \"command --help \", e.g. ");
+        say("To get a full explanation of the command and its syntax, type \"command --help \", e.g. ");
         say("java -jar scitokens.jar -batch create_keys -- help");
         say("  create_keys filename: This will create a JWK file and the corresponding public and private key files in pem format.");
         say("                        when this is done, the following files will be create filename.jwk, filename-public.pem and" +
