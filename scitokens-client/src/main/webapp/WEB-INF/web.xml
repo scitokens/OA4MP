@@ -11,36 +11,50 @@
 
     <servlet>
         <servlet-name>startRequest</servlet-name>
-        <!--internal name of the servlet-->
         <servlet-class>org.scitokens.client.STStartRequest</servlet-class>
         <load-on-startup>1</load-on-startup>
-        <!--load as soon as tomcat starts?-->
     </servlet>
 
     <servlet-mapping>
         <servlet-name>startRequest</servlet-name>
-        <!--the servlet-name above-->
         <url-pattern>/startRequest</url-pattern>
-        <!--what needs to be in the url, so http://foo.org/client/simple-->
     </servlet-mapping>
 
 
     <servlet>
         <servlet-name>ready</servlet-name>
-        <!--internal name of the servlet-->
         <servlet-class>org.scitokens.client.STReadyServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
-        <!--load as soon as tomcat starts?-->
     </servlet>
 
     <servlet-mapping>
         <servlet-name>ready</servlet-name>
-        <!--the servlet-name above-->
         <url-pattern>/ready</url-pattern>
-        <!--what needs to be in the url, so http://foo.org/client/simple-->
     </servlet-mapping>
+<!--
+    <servlet>
+           <servlet-name>startRequest</servlet-name>
+           <servlet-class>edu.uiuc.ncsa.oa4mp.oauth2.client.servlet.OA2StartRequest</servlet-class>
+           <load-on-startup>1</load-on-startup>
+       </servlet>
+
+       <servlet-mapping>
+           <servlet-name>startRequest</servlet-name>
+           <url-pattern>/startRequest</url-pattern>
+       </servlet-mapping>
 
 
+       <servlet>
+           <servlet-name>ready</servlet-name>
+           <servlet-class>edu.uiuc.ncsa.oa4mp.oauth2.client.servlet.OA2ReadyServlet</servlet-class>
+           <load-on-startup>1</load-on-startup>
+       </servlet>
+
+       <servlet-mapping>
+           <servlet-name>ready</servlet-name>
+           <url-pattern>/ready</url-pattern>
+       </servlet-mapping>
+    -->
     <welcome-file-list>
         <welcome-file>
             index.html <!--default file to be displayed at http://foo.org/client-->
