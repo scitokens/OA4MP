@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.scitokens</groupId>
         <artifactId>scitokens-java</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <properties>
@@ -26,13 +26,13 @@
               <type>war</type>
               <scope>runtime</scope>
           </dependency>-->
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-server-oauth2</artifactId>
-            <version>3.5-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>-->
+        <!--        <dependency>
+                    <groupId>edu.uiuc.ncsa.myproxy</groupId>
+                    <artifactId>oa4mp-server-oauth2</artifactId>
+                    <version>3.5-SNAPSHOT</version>
+                    <type>test-jar</type>
+                    <scope>test</scope>
+                </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-api</artifactId>
@@ -58,28 +58,28 @@
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
             <version>3.5-SNAPSHOT</version>
         </dependency>
- <!--       <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-core</artifactId>
-            <version>3.5-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>-->
- <!--       <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-delegation-common</artifactId>
-            <version>3.5-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>-->
+        <!--       <dependency>
+                   <groupId>edu.uiuc.ncsa.security</groupId>
+                   <artifactId>ncsa-security-core</artifactId>
+                   <version>3.5-SNAPSHOT</version>
+                   <type>test-jar</type>
+                   <scope>test</scope>
+               </dependency>-->
+        <!--       <dependency>
+                   <groupId>edu.uiuc.ncsa.security.delegation</groupId>
+                   <artifactId>ncsa-security-delegation-common</artifactId>
+                   <version>3.5-SNAPSHOT</version>
+                   <type>test-jar</type>
+                   <scope>test</scope>
+               </dependency>-->
 
- <!--       <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-server-test</artifactId>
-            <version>3.5-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>-->
+        <!--       <dependency>
+                   <groupId>edu.uiuc.ncsa.myproxy</groupId>
+                   <artifactId>oa4mp-server-test</artifactId>
+                   <version>3.5-SNAPSHOT</version>
+                   <type>test-jar</type>
+                   <scope>test</scope>
+               </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-2.0</artifactId>
@@ -214,6 +214,41 @@
 
                     </configuration>
                 </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Java 8 specific or empty javadoc tags make the build fail -->
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                            <aggregate>true</aggregate>
+                            <use>false</use>
+
+                        </configuration>
+
+                    </execution>
+                </executions>
+
+            </plugin>
         </plugins>
         <finalName>scitokens-common</finalName>
     </build>
