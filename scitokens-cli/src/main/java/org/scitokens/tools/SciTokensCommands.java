@@ -1,8 +1,8 @@
 package org.scitokens.tools;
 
 import edu.uiuc.ncsa.myproxy.oauth2.tools.SigningCommands;
+import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -14,10 +14,9 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.scitokens.util.SciTokensUtil;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.net.URI;
 import java.util.StringTokenizer;
 
@@ -50,14 +49,16 @@ public class SciTokensCommands extends CommonCommands {
     JSONWebKeys keys = null;
 
     String wellKnown = null;
-    public void set_well_known(InputLine inputLine) throws Exception{
+
+    public void set_well_known(InputLine inputLine) throws Exception {
 
     }
+
     protected void setKeysHelp() {
         say("set_keys: [-file filename | uri]");
         say("          Set the keys used for signing and validation in this session.");
         say("          Either supplied a fully qualified path to the file or a uri. If you pass nothing");
-        say("          prompted for a file. You can invoke this at any to change the keys.");
+        say("          yo will be prompted for a file. You can invoke this at any to change the keys.");
         say("  Related: create_keys");
     }
 
@@ -72,29 +73,43 @@ public class SciTokensCommands extends CommonCommands {
             setKeysHelp();
             return;
         }
-        if(inputLine.hasArg("-file")) {
+        File f = null;
+        if(inputLine.size() ==1){
+            boolean getFile = getBooleanInput("Did you want to enter a file name?");
+            if(getFile){
+               String fileName = getInput("Enter file name");
+               f = new File(fileName);
+            }else{
+                return;
+            }
+        }
+        if (inputLine.hasArg("-file")) {
 
-            File f = new File(inputLine.getArg(1));
+            f = new File(inputLine.getArg(2));
             if (!f.exists()) {
                 say("Sorry, the file you specified, \"" + (inputLine.getArg(1)) + "\" does not exist.");
                 return;
             }
+        }
+        if(f != null){
+            // got a file from some place. Rock on.
             keys = readKeys(f);
             if (defaultKeyID != null) {
                 if (keys.containsKey(defaultKeyID)) {
                     keys.setDefaultKeyID(defaultKeyID);
                 }
             }
-        }else{
+        } else {
             wellKnown = inputLine.getArg(1);
             try {
-                keys = JWTUtil.getJsonWebKeys(new ServiceClient(URI.create("https://scitokens.org")), wellKnown);
-            }catch(Throwable t){
-                             t.printStackTrace();
-                throw t;
+                keys = SciTokensUtil.getJsonWebKeys(new ServiceClient(URI.create("https://scitokens.org")), wellKnown);
+            } catch (Throwable t) {
+                sayi("Sorry, could not parse the url: \"" + t.getMessage() + "\"");
+                //throw t;
             }
         }
     }
+
 
     protected JSONWebKeys readKeys(File file) throws Exception {
         return JSONWebKeyUtil.fromJSON(file);
@@ -106,6 +121,19 @@ public class SciTokensCommands extends CommonCommands {
         if (!isBatchMode()) {
             super.say(x);
         }
+    }
+
+
+    protected void versionHelp() {
+        sayi("version - prints the current version number of this program.");
+    }
+
+    public void version(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            versionHelp();
+            return;
+        }
+        say("* SciTokens CLI (Command Line Interpreter) Version " + LoggingConfigLoader.VERSION_NUMBER);
     }
 
     protected void listKeysHelp() {
@@ -176,8 +204,11 @@ public class SciTokensCommands extends CommonCommands {
     protected void printCreateClaimsHelp() {
         say("create_claims: Prompt the user for key/value pairs and build a claims object. ");
         say("               This will write the object to a file for future use.");
+        say("               Note: You may input JSON objects as values as well. There are various");
+        say("               places (such as creating a token) that requires a set of claims. This command");
+        say("               lets you create one.");
         say("");
-        say("Related: parse_claims");
+        say("Related: create_token, parse_claims");
     }
 
     /**
@@ -198,31 +229,45 @@ public class SciTokensCommands extends CommonCommands {
                 continue;
             }
             String value = getInput("Enter value. multiple values should be comma separated");
-            if (0 < value.indexOf(",")) {
-                StringTokenizer st = new StringTokenizer(value, ",");
-                JSONArray array = new JSONArray();
-                while (st.hasMoreTokens()) {
-                    array.add(st.nextToken());
+            try{
+                // try JSON first
+                JSON json = JSONObject.fromObject(value);
+                jsonObject.put(key, json);
+            }catch(Throwable t){
+                // plan B. Did they give us a comma separated list we are to parse?
+                if (0 < value.indexOf(",")) {
+                 StringTokenizer st = new StringTokenizer(value, ",");
+                 JSONArray array = new JSONArray();
+                 while (st.hasMoreTokens()) {
+                     array.add(st.nextToken());
+                 }
+                 jsonObject.put(key, array);
+             } else {
+                    // ok, nothing works, it's just a string...
+                    jsonObject.put(key, value);
+
                 }
-                jsonObject.put(key, array);
-            } else {
-                jsonObject.put(key, value);
             }
         }
-        say(jsonObject.toString());
-        String writeToFile = getInput("Would you like to write this to a file?", "false");
-        Boolean isWrite = Boolean.parseBoolean(writeToFile);
+        sayi("Here's what you inputted");
+        say(jsonObject.toString(2));
+        boolean isWrite = getBooleanInput("Would you like to write this to a file?[y/n]");
+        //Boolean isWrite = Boolean.parseBoolean(writeToFile);
         if (isWrite) {
             String fileName = getInput("Enter filename");
             File f = new File(fileName);
             if (f.exists()) {
                 String overwrite = getInput("This file exists. Do you want to overwrite it?", "false");
-                if (Boolean.parseBoolean(overwrite)) {
-
-                } else {
-
+                if (!Boolean.parseBoolean(overwrite)) {
+                     return;
                 }
             }
+            String output = jsonObject.toString(2);
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(output.getBytes());
+            fos.flush();
+            fos.close();
+            sayi(f + " written!");
         }
     }
 
@@ -248,6 +293,8 @@ public class SciTokensCommands extends CommonCommands {
     protected void printSetDefaultIDHelp() {
         say("set_default_id [keyid]: This will set the default key id to be used for all signing and verification.");
         say("                        If this is not set, you will be prompted each time for an id.");
+        say("                        Remember that a set of web keys does not have a default. If you import.");
+        say("                        a set, you should set one as default.");
     }
 
     public void set_default_id(InputLine inputLine) throws Exception {
@@ -273,6 +320,8 @@ public class SciTokensCommands extends CommonCommands {
         say("           Read a file and print out if it parses as JSON.");
         say("           If the filename is omitted, you will be prompted for it.");
         say("           Note that this will try to give some limited feedback in syntax errors.");
+        say("           The intent is that if you have written a file with claims, this lets you");
+        say("           validate the JSON before using it.");
         say("Related: create_claims");
     }
 
@@ -344,10 +393,10 @@ public class SciTokensCommands extends CommonCommands {
         say("create_token [-file claims -keys keyfile -keyid id]");
         say("              This will take the current keys (uses default) and a file containing a JSON");
         say("              format set of claims. It will then sign the claims with the right headers etc.");
-        say("              and print out the results to the console. Any of the arguments omitted will cause you");
+        say("              and print out the resulting JWT to the console. Any of the arguments omitted will cause you");
         say("              to be prompted. If you have already set the key and keyid these will be used.");
         say("");
-        say("Related: set_keys, set_default_id");
+        say("Related: set_keys, set_default_id, print_token");
     }
 
     String lastToken = null;
@@ -413,7 +462,7 @@ public class SciTokensCommands extends CommonCommands {
             claims = JSONObject.fromObject(readFile(x));
 
         }
-        String signedToken = JWTUtil.createJWT(claims, localKeys.get(localDefaultID));
+        String signedToken = SciTokensUtil.createJWT(claims, localKeys.get(localDefaultID));
         lastToken = signedToken;
         say(signedToken);
     }
@@ -506,7 +555,7 @@ public class SciTokensCommands extends CommonCommands {
         JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[1])));
         say("header=" + h);
         say("payload=" + p);
-        if (JWTUtil.verify(h, p, x[2], keys.get(defaultKeyID))) {
+        if (SciTokensUtil.verify(h, p, x[2], keys.get(defaultKeyID))) {
             say("token valid!");
         } else {
             say("could not validate token");

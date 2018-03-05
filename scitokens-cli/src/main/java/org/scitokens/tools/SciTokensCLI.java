@@ -7,6 +7,9 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -75,13 +78,183 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
         say("Type 'exit' when you wish to exit the component and return to the main menu");
     }
 
+
+    /*
+{"claims":
+  {"$logic":
+     {"$if":{"$and":[
+                    {"$match":{"@idp","https://grid.bigstate.edu/services"}},
+                    {"$endsWith":["@eppn","@ligo.org"]}
+                   ]
+           }
+     },
+     {"$then":[
+         {$set:{"@aud":"https://a.b.c/ligo"}},
+         {$set:{"@sub":{"$toLowerCase":"@username"}},
+         ]
+     }
+  },
+  {"$access":[
+     {"read":"file:///home/@group_id/@user_id"},
+     {"write":"file://a.b.c/area51/@group_id"},
+     {"write":"file://p.q.r/area51/@group_id"}
+     ]
+  },
+  {"comment":"This matchs idp and domain of the user before setting the audience and subject"}
+}
+ */
+    public static void testJSON() throws Exception {
+        JSONObject claims = new JSONObject();
+
+        Functor andF = new Functor("$and");
+
+        Functor matchF = new Functor("$match");
+
+        matchF.addArg("@idp");
+        matchF.addArg("https://grid.bigstate.edu/services");
+        andF.addArg(matchF);
+
+        Functor endsWithF = new Functor("$endsWith");
+        endsWithF.addArg("@eppn");
+        endsWithF.addArg("@ligo.org");
+        andF.addArg(endsWithF);
+
+        Functor isMemberOfF = new Functor("$isMemberOf");
+        JSONArray groups = new JSONArray();
+        groups.add("ligo-users");
+        groups.add("ligo-group1");
+        groups.add("ligo-group2");
+        isMemberOfF.addArg(groups);
+        andF.addArg(isMemberOfF);
+
+        Functor thenF = new Functor("$then");
+        Functor set1 = new Functor("$set");
+        set1.addArg("@aud");
+        set1.addArg("@https://a.b.c/ligo.org");
+        thenF.addArg(set1);
+
+        Functor set2 = new Functor("$set");
+        set2.addArg("sub");
+        Functor toLowerCaseF = new Functor("$toLowerCase");
+        toLowerCaseF.addArg("@username");
+        set2.addArg(toLowerCaseF);
+        thenF.addArg(set2);
+
+        Functor ifF = new Functor("$if");
+        ifF.addArg(andF);
+
+        System.out.println(ifF.toJSON().toString(2));
+        System.out.println(thenF.toJSON().toString(2));
+         claims.put(ifF.getName(), ifF.getArgs());
+         claims.put(thenF.getName(), thenF.getArgs());
+
+        Functor accessF = new Functor("$access");
+        accessF.addArg(PTemplate.create("read","file:///home/@group_id/@user_id"));
+
+        accessF.addArg(PTemplate.create("write","file://a.b.c/area51/@group_id"));
+        accessF.addArg(PTemplate.create("write","file://a.b.c/area51/@group_id"));
+        accessF.addArg(PTemplate.create("write","file://a.b.c/area51/@group_id/@username"));
+        claims.put(accessF.getName(), accessF.getArgs());
+
+
+        System.out.println(claims.toString(2));
+
+        /*
+            {"read":"file:///home/@group_id/@user_id"},
+     {"write":"file://a.b.c/area51/@group_id"},
+     {"write":"file://p.q.r/area51/@group_id"}
+
+         */
+
+
+    }
+
+    public static class Functor {
+        public Functor(String name) {
+            setName(name);
+        }
+
+        JSONArray args = new JSONArray();
+
+        String name;
+        public void setName(String name){
+                 this.name = name;
+        }
+
+        public String getName(){
+            return name;
+        }
+        public void addArg(String x){
+            args.add(x);
+        }
+
+        public void addArg(JSON x){
+            args.add(x);
+        }
+
+        public void addArg(Functor x){
+            args.add(x.toJSON());
+        }
+        public JSONObject toJSON(){
+            JSONObject json = new JSONObject();
+            json.put(name, args);
+            return json;
+        }
+
+        public JSONArray getArgs(){
+            return args;
+        }
+
+    }
+
+    public static class PTemplate{
+        public static JSONObject create(String op, String template){
+            PTemplate x = new PTemplate(op, template);
+            return x.toJSON();
+        }
+        public PTemplate(String op, String template) {
+            this.op = op;
+            this.template = template;
+        }
+
+        String op;
+        String template;
+
+        public String getOp() {
+            return op;
+        }
+
+        public void setOp(String op) {
+            this.op = op;
+        }
+
+        public String getTemplate() {
+            return template;
+        }
+
+        public void setTemplate(String template) {
+            this.template = template;
+        }
+        public JSONObject toJSON(){
+            JSONObject json = new JSONObject();
+            json.put(getOp(), getTemplate());
+            return json;
+        }
+    }
     public static void main(String[] args) {
+        try {
+            testJSON();
+            return;
+        } catch (Exception x) {
+            x.printStackTrace();
+        }
         SciTokensCLI oa2Commands = new SciTokensCLI(null);
         SciTokensCommands sciTokensCommands = new SciTokensCommands(null);
         try {
             CLIDriver cli = new CLIDriver(sciTokensCommands);
             if (args == null || args.length == 0) {
                 //oa2Commands.start(args);
+                oa2Commands.about();
                 cli.start();
                 return;
             }
@@ -103,7 +276,7 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
             cli.execute(cmdLine);
 
         } catch (Throwable t) {
-            if(sciTokensCommands.isBatchMode()){
+            if (sciTokensCommands.isBatchMode()) {
                 System.exit(1);
             }
             t.printStackTrace();

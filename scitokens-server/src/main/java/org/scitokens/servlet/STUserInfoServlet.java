@@ -1,13 +1,14 @@
 package org.scitokens.servlet;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.UserInfoServlet;
-import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import net.sf.json.JSONObject;
+import org.scitokens.loader.STSE;
+import org.scitokens.util.SciTokensUtil;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.scitokens.util.STConstants.JWT_ID;
+import static org.scitokens.util.SciTokensClaims.JWT_ID;
+
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -18,10 +19,10 @@ public class STUserInfoServlet extends UserInfoServlet {
     @Override
     protected String getRawAT(HttpServletRequest request) {
         String rawAT = super.getRawAT(request);
-        OA2SE oa2se = (OA2SE)getServiceEnvironment();
+        STSE oa2se = (STSE)getServiceEnvironment();
         // The rub here is that we may have to parse this as a JWT token.
         try{
-            JSONObject sciToken = JWTUtil.verifyAndReadJWT(rawAT, oa2se.getJsonWebKeys());
+            JSONObject sciToken = SciTokensUtil.verifyAndReadJWT(rawAT, oa2se.getJsonWebKeys());
             if(sciToken.containsKey(JWT_ID)){
                 return sciToken.get(JWT_ID).toString();
             }

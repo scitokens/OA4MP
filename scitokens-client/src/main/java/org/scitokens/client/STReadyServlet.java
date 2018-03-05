@@ -11,7 +11,6 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2RedirectableError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
@@ -23,6 +22,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.scitokens.util.SciTokensUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -124,7 +124,7 @@ public class STReadyServlet extends ClientServlet {
 
         boolean isVerified = false;
         try {
-            JSONObject scitoken = JWTUtil.verifyAndReadJWT(rawAT, jsonWebKeys);
+            JSONObject scitoken = SciTokensUtil.verifyAndReadJWT(rawAT, jsonWebKeys);
             request.setAttribute("st_payload", scitoken.toString(2));
             isVerified = true;
         } catch (Throwable t) {
@@ -143,52 +143,29 @@ public class STReadyServlet extends ClientServlet {
         }
 
         request.setAttribute("accessToken", formattedToken);
-        String[] atParts = JWTUtil.decat(rawAT);
-        String h = atParts[JWTUtil.HEADER_INDEX];
+        String[] atParts = SciTokensUtil.decat(rawAT);
+        String h = atParts[SciTokensUtil.HEADER_INDEX];
+        JSONObject header = null;
 
+        String p = atParts[SciTokensUtil.PAYLOAD_INDEX];
+        try {
+            header = JSONObject.fromObject(new String(Base64.decodeBase64(h)));
+            request.setAttribute("st_accessToken2", atResponse2.getAccessToken().getToken());
+            request.setAttribute("st_accessToken", formattedToken);
+            request.setAttribute("st_header", header.toString(2));
+            request.setAttribute("st_verified", Boolean.toString(isVerified));
+            JSONWebKey webKey = jsonWebKeys.get(header.get(SciTokensUtil.KEY_ID));
+            String keyPEM = KeyUtil.toX509PEM(webKey.publicKey);
+            request.setAttribute("st_public_key", keyPEM);
 
-        String p = atParts[JWTUtil.PAYLOAD_INDEX];
+        }catch(Throwable t){
+            getMyLogger().warn("Error decoding header from response", t);
+            System.err.println("Returned raw AT=" + rawAT);
+        }
 
-        JSONObject header = JSONObject.fromObject(new String(Base64.decodeBase64(h)));
-
-        request.setAttribute("st_accessToken2", atResponse2.getAccessToken().getToken());
-        request.setAttribute("st_accessToken", formattedToken);
-        request.setAttribute("st_header", header.toString(2));
-        request.setAttribute("st_verified", Boolean.toString(isVerified));
 
         // now we need to get the JWK that was used and return it in PEM format.
-        JSONWebKey webKey = jsonWebKeys.get(header.get(JWTUtil.KEY_ID));
-        String keyPEM = KeyUtil.toX509PEM(webKey.publicKey);
-        request.setAttribute("st_public_key", keyPEM);
 
-     /*
-        if (getCerts) {
-            if (assetResponse.getX509Certificates() == null) {
-                request.setAttribute("certSubject", "(no cert returned)");
-            } else {
-                X509Certificate cert = assetResponse.getX509Certificates()[0];
-                // Rest of this is putting up something for the user to see
-                request.setAttribute("certSubject", cert.getSubjectDN());
-                request.setAttribute("cert", CertUtil.toPEM(assetResponse.getX509Certificates()));
-                request.setAttribute("username", assetResponse.getUsername());
-                // FIX OAUTH-216. Note that this is displayed on the client's success page.
-                if(asset.getPrivateKey() != null) {
-                    request.setAttribute("privateKey", KeyUtil.toPKCS1PEM(asset.getPrivateKey()));
-                }else{
-                    request.setAttribute("privateKey", "(none)");
-                }
-            }
-        } else {
-            request.setAttribute("certSubject", "(no cert requested)");
-        }
-        if (ui != null) {
-            String output = JSONUtils.valueToString(ui.toJSon(), 4, 2);
-            request.setAttribute("userinfo", output);
-        } else {
-            request.setAttribute("userinfo", "no user info returned.");
-        }
-        // Fix in cases where the server request passes through Apache before going to Tomcat.
-       */
         String contextPath = request.getContextPath();
         if (!contextPath.endsWith("/")) {
             contextPath = contextPath + "/";

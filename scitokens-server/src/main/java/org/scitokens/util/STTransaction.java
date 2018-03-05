@@ -20,6 +20,12 @@ public class STTransaction extends OA2ServiceTransaction {
 
     JSONObject claims;
 
+    /**
+     * These are the claims that are returned as the SciToken. Note that these are used to build the JWT
+     * that contains a signature, but we only store the actual claims.
+     * @return
+     */
+
     public JSONObject getClaims() {
         return claims;
     }
@@ -37,4 +43,6 @@ public class STTransaction extends OA2ServiceTransaction {
     }
 
     String stScopes;
+
+
 }
