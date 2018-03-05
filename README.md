@@ -1,7 +1,7 @@
-# OAuth for MyProxy
+# SciTokens for Java
 
-[![Build Status](https://travis-ci.org/ncsa/OA4MP.svg?branch=master)](https://travis-ci.org/ncsa/OA4MP)
-[![Javadocs](https://www.javadoc.io/badge/edu.uiuc.ncsa.myproxy/oa4mp-client-api.svg)](https://www.javadoc.io/doc/edu.uiuc.ncsa.myproxy/oa4mp-client-api)
+[![Build Status](https://travis-ci.org/scitokens/scitokens-java.svg?branch=master)](https://travis-ci.org/scitokens/scitokens-java)
+[![Javadocs](https://www.javadoc.io/badge/org.scitokens/scitokens-client.svg)](https://www.javadoc.io/doc/org.scitokens/scitokens-client)
 
 ## Prerequisites
 
@@ -10,4 +10,4 @@
 
 ## Docs
 
-http://grid.ncsa.illinois.edu/myproxy/oauth/
+https://scitokens.org/
