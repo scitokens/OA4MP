@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
  */
 public class STStartRequest extends ClientServlet {
     public static final String SCOPE_CAPUT = "demo:";
+
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         info("1.a. Starting transaction");
@@ -34,22 +35,30 @@ public class STStartRequest extends ClientServlet {
         OA4MPResponse gtwResp = null;
         // Drumroll please: here is the work for this call.
         Identifier id = AssetStoreUtil.createID();
-        OA2ClientEnvironment oa2ce = (OA2ClientEnvironment)getEnvironment();
+        OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getEnvironment();
         Collection<String> oldScopes = oa2ce.getScopes();
         // Block to snarf up scopes and add them.
+        // We are ignoring the old scopes which are by default openid and such.
+        // We only want new scopes.
+        System.err.println(getClass().getSimpleName() + ": scopes in CE= " + oa2ce.getScopes());
+
         String rawScopes = request.getParameter("scopes");
-        List<String> newScopes = new ArrayList<>();
-        newScopes.addAll(oldScopes);
-        StringTokenizer st = new StringTokenizer(rawScopes, " ");
-        while(st.hasMoreTokens()){
-            String x= st.nextToken();
-            if(x.startsWith(SCOPE_CAPUT)){
+        System.err.println(getClass().getSimpleName() + ": scopes = " + rawScopes);
+        List<String> newScopes = null;
+        if (rawScopes != null) {
+            newScopes = new ArrayList<>();
+//            newScopes.addAll(oldScopes);
+            StringTokenizer st = new StringTokenizer(rawScopes, " ");
+            while (st.hasMoreTokens()) {
+                String x = st.nextToken();
                 newScopes.add(x.trim());
             }
         }
+        System.err.println(getClass().getSimpleName() + ": setting scopes to " + newScopes);
+
+        oa2ce.setScopes(newScopes);
 
         gtwResp = getOA4MPService().requestCert(id);
-        oa2ce.setScopes(oldScopes);
 
         // if there is a store, store something in it.
         Cookie cookie = new Cookie(OA4MP_CLIENT_REQUEST_ID, id.getUri().toString());

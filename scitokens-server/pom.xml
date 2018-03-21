@@ -64,6 +64,12 @@
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
             <version>3.6-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
         <!-- <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>ncsa-security-core</artifactId>

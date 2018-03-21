@@ -1,0 +1,23 @@
+package org.scitokens.util;
+
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
+import net.sf.json.JSONObject;
+
+/**
+ * <p>Created by Jeff Gaynor<br>
+ * on 3/7/18 at  4:59 PM
+ */
+public class STClient extends OA2Client{
+    public static final String SCITOKENS_KEY = "sciTokens";
+    public STClient(Identifier identifier) {
+        super(identifier);
+    }
+
+    public JSONObject getSciTokensConfig(){
+        if(config == null || config.isEmpty() || !config.containsKey(SCITOKENS_KEY)){
+            return new JSONObject();
+        }
+        return config.getJSONObject(SCITOKENS_KEY);
+    }
+}

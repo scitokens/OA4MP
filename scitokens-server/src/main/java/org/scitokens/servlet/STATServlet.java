@@ -1,5 +1,7 @@
 package org.scitokens.servlet;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.GroupElement;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.Groups;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2SQLTStore;
@@ -18,11 +20,11 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.scitokens.loader.STSE;
-import org.scitokens.util.STConstants;
-import org.scitokens.util.STTransaction;
-import org.scitokens.util.SciTokensUtil;
+import org.scitokens.util.*;
+import org.scitokens.util.claims.STFunctorFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +34,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims.*;
+import static org.scitokens.util.PermissionResolver.ST_GROUP_NAME;
+import static org.scitokens.util.PermissionResolver.ST_USER_NAME;
+import static org.scitokens.util.SciTokensClaims.ST_CLIENT_IDENTIFIER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -140,6 +145,32 @@ public class STATServlet extends OA2ATServlet implements STConstants {
 
     }
 
+
+    String rawTemplates = "[\n" +
+               "{\"read\": \"file:///home/${" + ST_GROUP_NAME + "}/${" + ST_USER_NAME + "}/**\"},\n" +
+               "{\"write\": \"file:///home/${" + ST_GROUP_NAME + "}/${" + ST_USER_NAME + "}/**\"},\n" +
+               "{\"execute\":\"file:///home/${" + ST_GROUP_NAME + "}/${" + ST_USER_NAME + "}/**\"},\n" +
+               "{\"execute\":\"file:///c:/users/${" + ST_USER_NAME + "}/aesir/**\"},\n" +
+               "{\"read\": \"ftp://data.bigstate.edu/secure/${"+ST_GROUP_NAME + "}/**\"},\n" +
+               "{\"write\": \"ftp://data.bigstate.edu/secure/${"  + ST_GROUP_NAME + "}/${" + ST_USER_NAME + "}/**\"}\n" +
+               "  ]\n";
+       JSONArray templates = null;
+       /*
+       TESTS TO DO
+       test .../*foo.xls for permissions to specific files.
+       scitokens:/scopes?write#ftp://data.bigstate.edu/home/asgaard/project29/data
+
+        */
+
+
+       protected JSONArray getTemplates() {
+           if (templates == null) {
+               templates = JSONArray.fromObject(rawTemplates);
+               System.out.println("**templates\n" + templates);
+           }
+           return templates;
+       }
+
     /**
      * This creates a SciToken
      *
@@ -154,26 +185,53 @@ public class STATServlet extends OA2ATServlet implements STConstants {
                                  Map<String, String> parameters,
                                  JSONWebKey key
     ) throws Throwable {
-        JSONObject sciTokens = new JSONObject();
-        sciTokens.put(org.scitokens.util.SciTokensClaims.JWT_ID, accessToken.getToken());
 
-        //Map<String, String> parameters = atResponse.getParameters();
-        //STTransaction stTransaction = ;
+        JSONObject sciTokens = new JSONObject();
+        // Make the default set of claims
+        sciTokens.put(org.scitokens.util.SciTokensClaims.JWT_ID, accessToken.getToken());
 
         sciTokens.put(ISSUER, parameters.get(ISSUER));
         sciTokens.put(SUBJECT, parameters.get(SUBJECT));
         sciTokens.put(EXPIRATION, Long.valueOf(System.currentTimeMillis() / 1000L + 900L));
-        //  sciTokens.put(AUDIENCE, parameters.get("client_id"));
+        sciTokens.put(AUDIENCE, parameters.get("client_id"));
+        sciTokens.put(ST_CLIENT_IDENTIFIER, parameters.get("client_id"));
         sciTokens.put(ISSUED_AT, Long.valueOf(System.currentTimeMillis() / 1000L));
-/*
-        JSONArray array = new JSONArray();
-        array.add("read:/protected");
-        array.add("write:protected");
-        sciTokens.put("authz", array);
-*/
-        sciTokens.put("path", "/user/" + stTransaction.getUsername());
-        sciTokens.put(org.scitokens.util.SciTokensClaims.ST_SCOPE, "read:/protected");
-        DebugUtil.dbg(STATServlet.class, "scitoken=" + sciTokens.toString(2));
+        sciTokens.put(NOT_VALID_BEFORE, Long.valueOf((System.currentTimeMillis()-5000L) / 1000L)); // not before is 5 minutes before current
+
+        STClient stClient = (STClient) stTransaction.getClient();
+        // process them.
+        STClaimsHandler claimsHandler = new STClaimsHandler(stClient.getSciTokensConfig());
+
+        STFunctorFactory functorFactory = new STFunctorFactory(sciTokens, claimsHandler);
+         claimsHandler.process(sciTokens);
+        Groups groups = new Groups();
+                  groups.put(new GroupElement("area51"));
+                  groups.put(new GroupElement("asgaard"));
+                  groups.put(new GroupElement("aesir"));
+
+        //PermissionResolver permissionResolver = new PermissionResolver(claimsHandler.getTemplates(),
+        PermissionResolver permissionResolver = new PermissionResolver(getTemplates(),
+                sciTokens.getString(SUBJECT),groups );
+        DebugUtil.dbg(this, "ST scopes = " + stTransaction.getStScopes());
+        DebugUtil.dbg(this, "scopes = " + stTransaction.getScopes());
+        if(stTransaction.getScopes()!=null) {
+            JSONArray scopeArray = new JSONArray();
+            for(String token : stTransaction.getScopes()){
+                try{
+                    URI s = permissionResolver.resolve(URI.create(token));
+                    DebugUtil.dbg(this, "** resolved scope=" + s);
+
+                     if(s != null){
+                         scopeArray.add(s.toString()); // or the JSONArray object serializes it into a huge object.
+                     }
+                }catch(Throwable t){
+                    warn("Invalid URI \"" + token + "\" is ignored");
+                }
+            }
+            sciTokens.put(org.scitokens.util.SciTokensClaims.ST_SCOPE, scopeArray.toString());
+        }
+
+        DebugUtil.dbg(this, "scitoken=" + sciTokens.toString(2));
         stTransaction.setClaims(sciTokens);
         String newAT = SciTokensUtil.createJWT(sciTokens, key);
 

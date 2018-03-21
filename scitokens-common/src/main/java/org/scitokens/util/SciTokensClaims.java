@@ -9,5 +9,6 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
 public interface SciTokensClaims extends OA2Claims {
     public static final String JWT_ID = "jti";
     public static String ST_SCOPE = "scp";
+    public static String ST_CLIENT_IDENTIFIER = "cid";
 
 }

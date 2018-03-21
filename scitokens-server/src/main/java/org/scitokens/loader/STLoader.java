@@ -4,13 +4,19 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
+import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientProvider;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.scitokens.util.STClient;
 import org.scitokens.util.STTransaction;
 import org.scitokens.util.STTransactionConverter;
 import org.scitokens.util.STTransactionKeys;
@@ -123,5 +129,20 @@ public class STLoader<T extends STSE> extends OA2ConfigurationLoader<T> {
                 getClientStoreProvider().get());
         return getTSP(tp, tc);
 
+    }
+
+    public static class STClientProvider<V extends OA2Client> extends OA2ClientProvider{
+        public STClientProvider(IdentifierProvider idProvider) {
+            super(idProvider);
+        }
+        @Override
+    protected V newClient(boolean createNewIdentifier) {
+       return (V) new STClient(createNewId(createNewIdentifier));
+    }
+
+    }
+    @Override
+    public IdentifiableProvider<? extends Client> getClientProvider() {
+            return new STClientProvider(new OA4MPIdentifierProvider(SCHEME, SCHEME_SPECIFIC_PART, OA2Constants.CLIENT_ID, false));
     }
 }

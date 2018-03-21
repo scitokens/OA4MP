@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>A Sample SciTokens Client </title>
+</head>
+<body>
+Welcome to the sample Java client for SciTokens!<br><br>
+
+This will let you test getting a scitoken from the associated server. It is not intended to
+be more than an example.<br><br>
+
+<form action="startRequest" method="post">
+    Enter scopes with a single space between each one or one per line:
+    <br>
+    <textarea id="scopes" rows="5" cols="80" name="scopes"></textarea>
+    <br>
+    <td><input type="submit" value="start"/></td>
+</form>
+
+Note that this sample server supports the following test groups:
+<ul>
+    <li>asgaard</li>
+    <li>aesir</li>
+    <li>area51</li>
+</ul>
+
+<h2>Supported templates</h2>
+
+<ul>
+    <li>{"read":"file:///home/${group}/${username}/**"}</li>
+    <li>{"write":"file:///home/${group)/${username}/**"}</li>
+    <li>{"execute":"file:///home/${group)/${username}/**"}</li>
+    <li>{"execute":"file:///c:/users/${username}/aesir/**"}</li>
+    <li>{"read":"ftp://data.bigstate.edu/secure/${group}/**"}</li>
+    <li>{"write":"ftp://data.bigstate.edu/secure/${group}/${username}/**"}</li>
+</ul>
+Notice that the template support various protocols and also ther eis one for a Windows system
+that nicely handles the embedded drive. This is why uris are a good thing here.
+
+<h2>A note on using older requests</h2>
+These are of the form action:path (e.g. read:/home/area51/thor). You may request these
+and they will be converted internally into the expected request format of<br/>
+<pre><b>scitokens:/scopes?</b>action<b>#file:///</b>path</pre> <br/>
+so that this is implicitly a file on the local system (remember that a file uri
+that starts file:///... is equivalent to file://localhost/...).
+
+<h2>Some sample permission requests</h2>
+A list would be (assuming your name is <b>thor</b>. Substitute your logon name from the next page
+or just log in as thor.)
+<ul>
+    <li>scitokens:/scopes?read#file:///home/area51/thor</li>
+    <li>scitokens:/scopes?read#file:///home/area51/thor/sept-22.xls</li>
+    <li>scitokens:/scopes?execute#file:///c:/users/thor/aesir/ingest.sh</li>
+    <li>scitokens:/scopes?read#ftp://data.bigstate.edu/secure/asgaard/radar/sept-23.hdf</li>
+    <li>scitokens:/scopes?write#ftp://data.bigstate.edu/secure/asgaard/thor</li>
+    <li>scitokens:/scopes?write#ftp://data.bigstate.edu/secure/aesir/thor</li>
+    <li>scitokens:/scopes?read#ftp://data.bigstate.edu/secure/aesir</li>
+    <li>scitokens:/scopes?write#ftp://data.bigstate.edu/secure/asgaard/thor/project29/data</li>
+</ul>
+
+For fun, just cut and paste all of them (they will linebreak automatically) and see what you get.
+
+</body>
+</html>
