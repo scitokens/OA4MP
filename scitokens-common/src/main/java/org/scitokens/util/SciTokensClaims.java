@@ -1,6 +1,6 @@
 package org.scitokens.util;
 
-import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 
 /**
  * <p>Created by Jeff Gaynor<br>

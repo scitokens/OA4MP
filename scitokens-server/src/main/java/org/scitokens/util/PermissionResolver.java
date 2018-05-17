@@ -1,6 +1,6 @@
 package org.scitokens.util;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.Groups;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import net.sf.json.JSONArray;
@@ -27,7 +27,7 @@ public class PermissionResolver {
     public static final String ST_EXECUTE = "execute";
     public static final String ST_QUEUE = "queue";
     public static final String ST_GROUP_NAME = "group";
-    public static final String ST_USER_NAME = "username";
+    public static final String ST_USER_NAME = "sub";
 
     protected boolean hasUsername() {
         return username != null;

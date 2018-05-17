@@ -1,13 +1,13 @@
 package org.scitokens.test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.GroupElement;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.Groups;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.GroupElement;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups;
 import edu.uiuc.ncsa.security.util.TestBase;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.scitokens.util.PermissionResolver;
-import org.scitokens.util.STClaimsHandler;
+import org.scitokens.util.STClaimsProcessor;
 import org.scitokens.util.claims.STFunctorClaimTypes;
 
 import java.net.URI;
@@ -149,7 +149,7 @@ public class PermissionParserTest extends TestBase {
     public void testFactory() throws Exception{
         JSONObject cfg = new JSONObject();
         cfg.put(STFunctorClaimTypes.ACCESS.getValue(), getTemplates());
-        STClaimsHandler handler = new STClaimsHandler(cfg);
+        STClaimsProcessor handler = new STClaimsProcessor(cfg);
         handler.process(new HashMap<String, Object>());
         assert !handler.getTemplates().isEmpty();
     }

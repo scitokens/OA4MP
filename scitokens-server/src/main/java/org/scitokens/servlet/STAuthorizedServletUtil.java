@@ -1,7 +1,8 @@
 package org.scitokens.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServlet;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import org.scitokens.util.STTransaction;
 
@@ -15,7 +16,20 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.SCOPE;
  * <p>Created by Jeff Gaynor<br>
  * on 9/25/17 at  3:22 PM
  */
-public class STAuthorizedServlet extends OA2AuthorizedServlet {
+public class STAuthorizedServletUtil extends OA2AuthorizedServletUtil{
+    public STAuthorizedServletUtil(MyProxyDelegationServlet servlet) {
+        super(servlet);
+    }
+/*    protected void handleClaims(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, OA2ServiceTransaction transaction) throws Throwable {
+        STTransaction stTransaction = (STTransaction)transaction;
+        HTTPHeaderClaimsSource claimsSource = new HTTPHeaderClaimsSource();
+        UserInfo userInfo = new UserInfo();
+        userInfo.setMap(new JSONObject());
+        claimsSource.process(userInfo, httpServletRequest, transaction);
+        stTransaction.setClaims((JSONObject) userInfo.getMap());
+        servlet.getTransactionStore().save(stTransaction);
+    }*/
+
     @Override
     protected ArrayList<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
         STTransaction stTransaction = (STTransaction) st;

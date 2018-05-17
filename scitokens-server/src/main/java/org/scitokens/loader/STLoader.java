@@ -1,7 +1,7 @@
 package org.scitokens.loader;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.BasicScopeHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
@@ -67,7 +67,7 @@ public class STLoader<T extends STSE> extends OA2ConfigurationLoader<T> {
                     getMacp(),
                     getClientSecretLength(),
                     getScopes(),
-                    getScopeHandler(),
+                    getClaimSource(),
                     getLdapConfiguration(),
                     isRefreshTokenEnabled(),
                     isTwoFactorSupportEnabled(),
@@ -77,8 +77,8 @@ public class STLoader<T extends STSE> extends OA2ConfigurationLoader<T> {
                     getMLDAP(),
                     isUtilServerEnabled(),
                     issueSciTokenForAT());
-            if (getScopeHandler() instanceof BasicScopeHandler) {
-                ((BasicScopeHandler) getScopeHandler()).setOa2SE(se);
+            if (getClaimSource() instanceof BasicClaimsSourceImpl) {
+                ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE(se);
             }
             return se;
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {

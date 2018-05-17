@@ -1,6 +1,6 @@
 package org.scitokens.util;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClaimsHandler;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimsProcessor;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -13,8 +13,8 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 3/13/18 at  7:30 AM
  */
-public class STClaimsHandler extends ClaimsHandler {
-    public STClaimsHandler(JSONObject config) {
+public class STClaimsProcessor extends ClaimsProcessor {
+    public STClaimsProcessor(JSONObject config) {
         super(config);
     }
 

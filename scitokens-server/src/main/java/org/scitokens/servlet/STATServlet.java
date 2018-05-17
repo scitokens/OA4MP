@@ -1,7 +1,7 @@
 package org.scitokens.servlet;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.GroupElement;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.scopeHandlers.Groups;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.GroupElement;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2SQLTStore;
@@ -16,8 +16,9 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ATIResponse2;
-import edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -33,7 +34,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 import static org.scitokens.util.PermissionResolver.ST_GROUP_NAME;
 import static org.scitokens.util.PermissionResolver.ST_USER_NAME;
 import static org.scitokens.util.SciTokensClaims.ST_CLIENT_IDENTIFIER;
@@ -186,7 +187,7 @@ public class STATServlet extends OA2ATServlet implements STConstants {
                                  JSONWebKey key
     ) throws Throwable {
 
-        JSONObject sciTokens = new JSONObject();
+        JSONObject sciTokens = stTransaction.getClaims();
         // Make the default set of claims
         sciTokens.put(org.scitokens.util.SciTokensClaims.JWT_ID, accessToken.getToken());
 
@@ -200,17 +201,24 @@ public class STATServlet extends OA2ATServlet implements STConstants {
 
         STClient stClient = (STClient) stTransaction.getClient();
         // process them.
-        STClaimsHandler claimsHandler = new STClaimsHandler(stClient.getSciTokensConfig());
+        if(!stClient.getSciTokensConfig().isEmpty()) {
+            STClaimsProcessor claimsProcessor = new STClaimsProcessor(stClient.getSciTokensConfig());
 
-        STFunctorFactory functorFactory = new STFunctorFactory(sciTokens, claimsHandler);
-         claimsHandler.process(sciTokens);
+            STFunctorFactory functorFactory = new STFunctorFactory(sciTokens, claimsProcessor);
+            claimsProcessor.process(sciTokens);
+        }
         Groups groups = new Groups();
                   groups.put(new GroupElement("area51"));
                   groups.put(new GroupElement("asgaard"));
                   groups.put(new GroupElement("aesir"));
 
         //PermissionResolver permissionResolver = new PermissionResolver(claimsHandler.getTemplates(),
-        PermissionResolver permissionResolver = new PermissionResolver(getTemplates(),
+        // Next we make replacements as needed in the templates for claims. These are used for resolution.
+        JSONArray replacedTemplates = new JSONArray();
+        for(int i = 0; i < getTemplates().size(); i++){
+            replacedTemplates.add(TemplateUtil.replaceAll(getTemplates().get(i).toString(), sciTokens));
+        }
+        PermissionResolver permissionResolver = new PermissionResolver(replacedTemplates,
                 sciTokens.getString(SUBJECT),groups );
         DebugUtil.dbg(this, "ST scopes = " + stTransaction.getStScopes());
         DebugUtil.dbg(this, "scopes = " + stTransaction.getScopes());

@@ -27,6 +27,9 @@ public class STTransaction extends OA2ServiceTransaction {
      */
 
     public JSONObject getClaims() {
+        if(claims == null){
+            claims = new JSONObject();
+        }
         return claims;
     }
 

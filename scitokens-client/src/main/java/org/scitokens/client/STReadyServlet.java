@@ -83,12 +83,7 @@ public class STReadyServlet extends ClientServlet {
             String msg = "Error: no cookie found. Cannot save certificates";
             warn(msg);
             debug("No cookie found");
-            //if(asset == null) asset = new OA2Asset(BasicIdentifier.newID())
             atResponse2 = oa2MPService.getAccessToken(asset, grant);
-         /*   ui = oa2MPService.getUserInfo(atResponse2.getAccessToken().toString());
-            if (getCerts) {
-                assetResponse = oa2MPService.getCert(asset, atResponse2);
-            }*/
         } else {
             asset = (OA2Asset) getCE().getAssetStore().get(identifier);
             if (asset.getState() == null || !asset.getState().equals(state)) {
@@ -99,18 +94,7 @@ public class STReadyServlet extends ClientServlet {
                 throw new IllegalArgumentException("Error: The state returned by the server is invalid.");
             }
             atResponse2 = oa2MPService.getAccessToken(asset, grant);
-            //  ui = oa2MPService.getUserInfo(atResponse2.getAccessToken().getToken());
-     /*       ui = oa2MPService.getUserInfo(identifier);
-            if (getCerts) {
-                assetResponse = oa2MPService.getCert(asset, atResponse2);
-            }*/
-            // The general case is to do the call with the identifier if you want the asset store managed.
-            //assetResponse = getOA4MPService().getCert(token, null, BasicIdentifier.newID(identifier));
         }
-        // The work in this call
-
-        // Again, we take the first returned cert to peel off some information to display. This
-        // just proves we got a response.
 
         info("2.b. Done! Displaying success page.");
         String rawAT = atResponse2.getAccessToken().getToken();
