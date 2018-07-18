@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ATServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2SQLTStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -12,7 +13,6 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.server.ATIResponse2;
@@ -236,7 +236,15 @@ public class STATServlet extends OA2ATServlet implements STConstants {
                     warn("Invalid URI \"" + token + "\" is ignored");
                 }
             }
-            sciTokens.put(org.scitokens.util.SciTokensClaims.ST_SCOPE, scopeArray.toString());
+            String scopeString = "";
+            boolean firstPass = true;
+            for(int i = 0; i < scopeArray.size(); i++){
+                scopeString = scopeString + (firstPass?"":" ") + scopeArray.getString(i).trim();
+                if(firstPass ){
+                    firstPass = false;
+                }
+            }
+            sciTokens.put(org.scitokens.util.SciTokensClaims.ST_SCOPE, scopeString);
         }
 
         DebugUtil.dbg(this, "scitoken=" + sciTokens.toString(2));

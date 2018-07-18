@@ -2,6 +2,8 @@ package org.scitokens.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
@@ -12,8 +14,6 @@ import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2ClientProvider;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.scitokens.util.STClient;
@@ -74,7 +74,6 @@ public class STLoader<T extends STSE> extends OA2ConfigurationLoader<T> {
                     getMaxClientRefreshTokenLifetime(),
                     getJSONWebKeys(),
                     getIssuer(),
-                    getMLDAP(),
                     isUtilServerEnabled(),
                     issueSciTokenForAT());
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
@@ -131,7 +130,7 @@ public class STLoader<T extends STSE> extends OA2ConfigurationLoader<T> {
 
     }
 
-    public static class STClientProvider<V extends OA2Client> extends OA2ClientProvider{
+    public static class STClientProvider<V extends OA2Client> extends OA2ClientProvider {
         public STClientProvider(IdentifierProvider idProvider) {
             super(idProvider);
         }

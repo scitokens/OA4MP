@@ -57,14 +57,40 @@ public class STSE extends OA2SE {
                 long maxClientRefreshTokenLifetime,
                 JSONWebKeys jsonWebKeys,
                 String issuer,
-                Provider<LDAPStore> mldap,
                 boolean utilServletEnabled,
                 boolean isATasSTEnabled) {
-        super(logger, tsp, csp, maxAllowedNewClientRequests, rtLifetime, casp, mfp, mup, messagesProvider, agip, atip, paip, tfp, constants, ac, usernameTransformer, isPingable, psp, acs, clientSecretLength, scopes, claimSource, ldapConfiguration2, isRefreshTokenEnabled, twoFactorSupportEnabled, maxClientRefreshTokenLifetime, jsonWebKeys, issuer, mldap,
+        super(logger,
+                tsp,
+                csp,
+                maxAllowedNewClientRequests,
+                rtLifetime,
+                casp,
+                mfp,
+                mup,
+                messagesProvider,
+                agip,
+                atip,
+                paip,
+                tfp,
+                constants,
+                ac,
+                usernameTransformer,
+                isPingable,
+                psp,
+                acs,
+                clientSecretLength,
+                scopes,
+                claimSource,
+                ldapConfiguration2,
+                isRefreshTokenEnabled,
+                twoFactorSupportEnabled,
+                maxClientRefreshTokenLifetime,
+                jsonWebKeys, issuer,
                 utilServletEnabled);
 
         this.isATasSTEnabled = isATasSTEnabled;
     }
+
     boolean isATasSTEnabled = false;
 
     public boolean isATasSTEnabled() {

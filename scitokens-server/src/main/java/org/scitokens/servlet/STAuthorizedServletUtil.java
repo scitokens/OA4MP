@@ -1,6 +1,7 @@
 package org.scitokens.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
@@ -32,6 +33,7 @@ public class STAuthorizedServletUtil extends OA2AuthorizedServletUtil{
 
     @Override
     protected ArrayList<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
+        HTTPHeaderClaimsSource xx = null;
         STTransaction stTransaction = (STTransaction) st;
         System.err.println(getClass().getSimpleName() + ": scopes before resolveScopes = " + st.getScopes());
         System.err.println(getClass().getSimpleName() + ": STscopes before resolveScopes = " + ((STTransaction) st).getStScopes());
