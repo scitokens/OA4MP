@@ -20,5 +20,6 @@ public class STTransactionTable extends OA2TransactionTable {
          super.createColumnDescriptors();
          this.getColumnDescriptor().add(new ColumnDescriptorEntry(this.getSTK().sciTokens(), java.sql.Types.LONGVARCHAR));
          this.getColumnDescriptor().add(new ColumnDescriptorEntry(this.getSTK().stScopes(), java.sql.Types.LONGVARCHAR));
+         this.getColumnDescriptor().add(new ColumnDescriptorEntry(this.getSTK().audience(), java.sql.Types.LONGVARCHAR));
      }
 }

@@ -10,5 +10,9 @@ public interface SciTokensClaims extends OA2Claims {
     public static final String JWT_ID = "jti";
     public static String ST_SCOPE = "scope";
     public static String ST_CLIENT_IDENTIFIER = "cid";
+    public static String CLAIM_OPERATION_WRITE = "write";
+    public static String CLAIM_OPERATION_READ = "read";
+    public static String CLAIM_OPERATION_QUEUE = "queue";
+    public static String CLAIM_OPERATION_EXECUTE = "execute";
 
 }

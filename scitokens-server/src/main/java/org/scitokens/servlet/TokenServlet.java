@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 import org.scitokens.loader.STSE;
-import org.scitokens.util.STConstants;
+import org.scitokens.util.TokenExchangeConstants;
 import org.scitokens.util.STTransaction;
 import org.scitokens.util.SciTokensClaims;
 import org.scitokens.util.SciTokensUtil;
@@ -40,11 +40,11 @@ public class TokenServlet extends MyProxyDelegationServlet {
         if(grantType == null){
             throw new GeneralException("Error: No grant type");
         }
-        if(!grantType.equals(STConstants.TOKEN_EXCHANGE_GRANT_TYPE)){
+        if(!grantType.equals(TokenExchangeConstants.TOKEN_EXCHANGE_GRANT_TYPE)){
             throw new GeneralException("Error: Incorrect grant type");
         }
         String subjectTokenType = getFirstParameterValue(httpServletRequest, "subject_token_type");
-        if(subjectTokenType == null || !subjectTokenType.equals(STConstants.ACCESS_TOKEN_TYPE)){
+        if(subjectTokenType == null || !subjectTokenType.equals(TokenExchangeConstants.ACCESS_TOKEN_TYPE)){
             throw new GeneralException("Error: incorrect or unsupported subject token type");
         }
         String subjectToken = getFirstParameterValue(httpServletRequest, "subject_token");

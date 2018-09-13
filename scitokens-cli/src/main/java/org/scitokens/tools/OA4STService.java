@@ -13,7 +13,7 @@ import edu.uiuc.ncsa.security.oauth_2_0.client.ATServer2;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
-import org.scitokens.util.STConstants;
+import org.scitokens.util.TokenExchangeConstants;
 import org.scitokens.util.SciTokensUtil;
 
 import java.net.URI;
@@ -33,8 +33,8 @@ public class OA4STService extends OA2MPService {
 
         // Since this is new, we have to roll our own from scratch.
         HashMap<String, String> parameterMap = new HashMap<>();
-        parameterMap.put(OA2Constants.GRANT_TYPE, STConstants.TOKEN_EXCHANGE_GRANT_TYPE);
-        parameterMap.put("subject_token_type", STConstants.REFRESH_TOKEN_TYPE);
+        parameterMap.put(OA2Constants.GRANT_TYPE, TokenExchangeConstants.TOKEN_EXCHANGE_GRANT_TYPE);
+        parameterMap.put("subject_token_type", TokenExchangeConstants.REFRESH_TOKEN_TYPE);
         parameterMap.put("subject_token", refreshToken.getToken());
 
         String rawResponse = serviceClient.getRawResponse(parameterMap);
@@ -64,8 +64,8 @@ public class OA4STService extends OA2MPService {
 
         // Since this is new, we have to roll our own from scratch.
         HashMap<String, String> parameterMap = new HashMap<>();
-        parameterMap.put(OA2Constants.GRANT_TYPE, STConstants.TOKEN_EXCHANGE_GRANT_TYPE);
-        parameterMap.put("subject_token_type", STConstants.ACCESS_TOKEN_TYPE);
+        parameterMap.put(OA2Constants.GRANT_TYPE, TokenExchangeConstants.TOKEN_EXCHANGE_GRANT_TYPE);
+        parameterMap.put("subject_token_type", TokenExchangeConstants.ACCESS_TOKEN_TYPE);
         parameterMap.put("subject_token", accessToken.getToken());
 
         String rawResponse = serviceClient.getRawResponse(parameterMap);

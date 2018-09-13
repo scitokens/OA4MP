@@ -1,12 +1,15 @@
 package org.scitokens.util;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimsProcessor;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.scitokens.util.claims.STFunctorFactory;
 import org.scitokens.util.claims.jAccess;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -46,4 +49,8 @@ public class STClaimsProcessor extends ClaimsProcessor {
         return templates;
     }
 
+    @Override
+    protected OA2FunctorFactory createFunctorFactory(Map<String, Object> claims, Collection<String> scopes) {
+        return new STFunctorFactory(claims, scopes, this);
+    }
 }

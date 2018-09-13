@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -34,12 +35,24 @@ public class STTransactionConverter<V extends STTransaction> extends OA2TConvert
                 st.setClaims((JSONObject) claims);
             }
             if (claims instanceof String) {
-                JSONObject json = JSONObject.fromObject((String) claims);
+                JSONObject json = JSONObject.fromObject(claims);
                 st.setClaims(json);
             }
         }
         if (map.containsKey(getStTransactionKeys().stScopes())) {
             st.setStScopes(map.getString(getStTransactionKeys().stScopes()));
+        }
+        if (map.containsKey(getStTransactionKeys().audience())) {
+            Object audience = map.get(getStTransactionKeys().audience());
+            if (audience != null) {
+                if (audience instanceof JSONArray) {
+                    st.setAudience((JSONArray) audience);
+                }
+                if (audience instanceof String) {
+                    JSONArray json = JSONArray.fromObject(audience);
+                    st.setAudience(json);
+                }
+            }
         }
         return st;
     }
@@ -50,8 +63,18 @@ public class STTransactionConverter<V extends STTransaction> extends OA2TConvert
         if (t.getClaims() != null) {
             map.put(getStTransactionKeys().sciTokens(), t.getClaims().toString());
         }
-        if(t.getStScopes()!=null){
+        if (t.getStScopes() != null) {
             map.put(getStTransactionKeys().stScopes(), t.getStScopes());
+        }
+        if(t.getAudience() != null){
+            JSONArray jsonArray = null;
+            if(t.getAudience() instanceof JSONArray){
+                jsonArray  = (JSONArray) t.getAudience();
+            }else{
+                jsonArray = new JSONArray();
+                jsonArray.addAll(t.getAudience());
+            }
+            map.put(getStTransactionKeys().audience(), jsonArray.toString());
         }
     }
 

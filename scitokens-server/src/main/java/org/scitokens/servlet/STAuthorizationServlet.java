@@ -13,4 +13,6 @@ public class STAuthorizationServlet extends OA2AuthorizationServer
     protected OA2AuthorizedServletUtil getInitUtil() {
         return new STAuthorizedServletUtil(this);
     }
+
+
 }

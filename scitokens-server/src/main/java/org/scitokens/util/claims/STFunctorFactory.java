@@ -6,6 +6,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.scitokens.util.STClaimsProcessor;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -13,8 +14,10 @@ import java.util.Map;
  * on 3/13/18 at  7:39 AM
  */
 public class STFunctorFactory extends OA2FunctorFactory {
-    public STFunctorFactory(Map<String, Object> claims, STClaimsProcessor handler) {
-        super(claims);
+    public STFunctorFactory(Map<String, Object> claims,
+                            Collection<String> scopes,
+                            STClaimsProcessor handler) {
+        super(claims, scopes);
         this.handler = handler;
     }
 
@@ -22,11 +25,7 @@ public class STFunctorFactory extends OA2FunctorFactory {
 
     @Override
     protected JFunctor figureOutFunctor(JSONObject rawJson) {
-        JFunctor ff = super.figureOutFunctor(rawJson);
-        if (ff != null) {
-            // already got one.
-            return ff;
-        }
+        JFunctor ff = null;
         if (hasEnum(rawJson, STFunctorClaimTypes.ACCESS)) {
             jAccess j = new jAccess(claims);
             j.setTemplates(rawJson.getJSONArray(STFunctorClaimTypes.ACCESS.getValue()));
@@ -35,8 +34,11 @@ public class STFunctorFactory extends OA2FunctorFactory {
                 handler.getAccessList().add(j);
             }
             ff = j;
+            return ff;
         }
-        return ff;
+        return  super.figureOutFunctor(rawJson);
+
     }
+
 
 }

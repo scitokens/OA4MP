@@ -21,4 +21,12 @@ public class STTransactionKeys extends OA2TransactionKeys {
          return stScopes;
      }
 
+
+    protected String audience = "audience";
+
+    public String audience(String... x) {
+         if (0 < x.length) audience= x[0];
+         return audience;
+     }
+
 }

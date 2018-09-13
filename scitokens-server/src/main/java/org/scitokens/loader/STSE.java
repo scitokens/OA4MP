@@ -1,7 +1,6 @@
 package org.scitokens.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ldap.LDAPStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
@@ -99,5 +98,10 @@ public class STSE extends OA2SE {
 
     public void setIsATasSTEnabled(boolean isATasSTEnabled) {
         this.isATasSTEnabled = isATasSTEnabled;
+    }
+
+    @Override
+    public boolean isOIDCEnabled() {
+        return false;
     }
 }

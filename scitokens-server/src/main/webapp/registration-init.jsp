@@ -38,6 +38,13 @@
             </td>
         </tr>
         <tr>
+            <td>Configuration (advanced):</td>
+            <td>
+                    <textarea id="${configuration}" rows="5" cols="80"
+                              name="${configuration}">${configurationValue}</textarea>
+            </td>
+        </tr>
+        <tr>
             <td ${rtFieldVisible}>Refresh Token lifetime:</td>
             <td ${rtFieldVisible}><input type="text" size="25" name="${rtLifetime}" value="${rtLifetimeValue}"/>(in
                 seconds - leave blank for no refresh tokens.)

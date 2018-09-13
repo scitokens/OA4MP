@@ -1,16 +1,18 @@
 package org.scitokens.tools;
 
-import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
-import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
-import edu.uiuc.ncsa.security.util.cli.CommonCommands;
+import edu.uiuc.ncsa.security.util.cli.Commands;
 import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.apache.commons.lang.StringUtils;
+
+import java.io.*;
+import java.util.Vector;
+
+import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
 
 /**
  * This creates SciTokens at the command line from the utilities and can verify them as well.
@@ -56,217 +58,108 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
     @Override
     public void useHelp() {
         say("You may use this in both interactive mode and as a command line utility.");
-        say("To use in batch mode, supply the " + CommonCommands.BATCH_MODE_FLAG + " flag.");
+        say("To use in batch mode, supply the " + BATCH_MODE_FLAG + " flag.");
         say("This will suppress all output and will not prompt for missing arguments to functions.");
         say("If you omit this flag, then missing arguments will still cause you to be prompted.");
         say("Here is a list of commands:");
-        say("create_claims");
-        say("create_token");
-        say("list_key_ids");
+        say("Key commands");
+        say("------------");
+        say("create_keys");
+        say("set_keys");
         say("list_keys");
+        say("list_key_ids");
+        say("set_default_id");
+        say("print_default_id");
+        say("print_well_known");
+        say("Claim Commands");
+        say("--------------");
+        say("create_claims");
         say("parse_claims");
+        say("Token Commands");
+        say("--------------");
+        say("create_token");
         say("print_token");
-        say("To get a full explanation of the command and its syntax, type \"command --help \", e.g. ");
-        say("java -jar scitokens.jar -batch create_keys -- help");
-        say("  create_keys filename: This will create a JWK file and the corresponding public and private key files in pem format.");
-        say("                        when this is done, the following files will be create filename.jwk, filename-public.pem and" +
-                "                        filename-private.pem. At this point only 512 bit signing is supported.");
-        say("                        NOTE: the pem files are supplied so you can use them with other applications. This only uses the .jwk file");
-        say("  set_key filename: This will set the signing and validation key from the given file");
-        say("  sign string: This creates an id token from the given string.");
-        say("  -");
-        say("Type 'exit' when you wish to exit the component and return to the main menu");
+        say("validate_token");
+        say("To get a full explanation of the command and its syntax, type \"command --help \".");
+        say("Command line options");
+        say("--------------------");
+        say("These are flags and arguments to the command line processor.");
+        say(SHORT_VERBOSE_FLAG + "," +  LONG_VERBOSE_FLAG + "= turn verbose mode on. This allows you to see the internal workings of processing");
+        say("   You can set this in a batch file by invoking set_verbose true|false");
+        say(SHORT_NO_OUTPUT_FLAG + ", " +LONG_NO_OUTPUT_FLAG + " = turn off all output");
+        say("   You can set this in a batch file by invoking set_no_ouput true|false");
+        say(BATCH_MODE_FLAG + "= interpret everything else on the command line as a command, aside from flags. Note this means you can execute a single command.");
+        say(SciTokensCommands.BATCH_FILE_MODE_FLAG + "= this is the fully qualified path to a file of commands which will be interpreted one after the other.");
     }
 
 
-    /*
-{"claims":
-  {"$logic":
-     {"$if":{"$and":[
-                    {"$match":{"@idp","https://grid.bigstate.edu/services"}},
-                    {"$endsWith":["@eppn","@ligo.org"]}
-                   ]
-           }
-     },
-     {"$then":[
-         {$set:{"@aud":"https://a.b.c/ligo"}},
-         {$set:{"@sub":{"$toLowerCase":"@username"}},
-         ]
-     }
-  },
-  {"$access":[
-     {"read":"file:///home/@group_id/@user_id"},
-     {"write":"file://a.b.c/area51/@group_id"},
-     {"write":"file://p.q.r/area51/@group_id"}
-     ]
-  },
-  {"comment":"This matchs idp and domain of the user before setting the audience and subject"}
-}
- */
-    public static void testJSON() throws Exception {
-        JSONObject claims = new JSONObject();
 
-        Functor andF = new Functor("$and");
+    protected static String DUMMY_FUNCTION = "dummy0"; // used to create initial command line
 
-        Functor matchF = new Functor("$match");
-
-        matchF.addArg("@idp");
-        matchF.addArg("https://grid.bigstate.edu/services");
-        andF.addArg(matchF);
-
-        Functor endsWithF = new Functor("$endsWith");
-        endsWithF.addArg("@eppn");
-        endsWithF.addArg("@ligo.org");
-        andF.addArg(endsWithF);
-
-        Functor isMemberOfF = new Functor("$isMemberOf");
-        JSONArray groups = new JSONArray();
-        groups.add("ligo-users");
-        groups.add("ligo-group1");
-        groups.add("ligo-group2");
-        isMemberOfF.addArg(groups);
-        andF.addArg(isMemberOfF);
-
-        Functor thenF = new Functor("$then");
-        Functor set1 = new Functor("$set");
-        set1.addArg("@aud");
-        set1.addArg("@https://a.b.c/ligo.org");
-        thenF.addArg(set1);
-
-        Functor set2 = new Functor("$set");
-        set2.addArg("sub");
-        Functor toLowerCaseF = new Functor("$toLowerCase");
-        toLowerCaseF.addArg("@username");
-        set2.addArg(toLowerCaseF);
-        thenF.addArg(set2);
-
-        Functor ifF = new Functor("$if");
-        ifF.addArg(andF);
-
-        System.out.println(ifF.toJSON().toString(2));
-        System.out.println(thenF.toJSON().toString(2));
-         claims.put(ifF.getName(), ifF.getArgs());
-         claims.put(thenF.getName(), thenF.getArgs());
-
-        Functor accessF = new Functor("$access");
-        accessF.addArg(PTemplate.create("read","file:///home/@group_id/@user_id"));
-
-        accessF.addArg(PTemplate.create("write","file://a.b.c/area51/@group_id"));
-        accessF.addArg(PTemplate.create("write","file://a.b.c/area51/@group_id"));
-        accessF.addArg(PTemplate.create("write","file://a.b.c/area51/@group_id/@username"));
-        claims.put(accessF.getName(), accessF.getArgs());
+    public static String SHORT_HELP_FLAG = "-help";
+    public static String LONG_HELP_FLAG = "--help";
+    public static String SHORT_VERBOSE_FLAG = "-v";
+    public static String LONG_VERBOSE_FLAG = "--verbose";
+    public static String SHORT_NO_OUTPUT_FLAG = "-noOuput";
+    public static String LONG_NO_OUTPUT_FLAG = "--noOuput";
 
 
-        System.out.println(claims.toString(2));
-
-        /*
-            {"read":"file:///home/@group_id/@user_id"},
-     {"write":"file://a.b.c/area51/@group_id"},
-     {"write":"file://p.q.r/area51/@group_id"}
-
-         */
-
-
-    }
-
-    public static class Functor {
-        public Functor(String name) {
-            setName(name);
-        }
-
-        JSONArray args = new JSONArray();
-
-        String name;
-        public void setName(String name){
-                 this.name = name;
-        }
-
-        public String getName(){
-            return name;
-        }
-        public void addArg(String x){
-            args.add(x);
-        }
-
-        public void addArg(JSON x){
-            args.add(x);
-        }
-
-        public void addArg(Functor x){
-            args.add(x.toJSON());
-        }
-        public JSONObject toJSON(){
-            JSONObject json = new JSONObject();
-            json.put(name, args);
-            return json;
-        }
-
-        public JSONArray getArgs(){
-            return args;
-        }
-
-    }
-
-    public static class PTemplate{
-        public static JSONObject create(String op, String template){
-            PTemplate x = new PTemplate(op, template);
-            return x.toJSON();
-        }
-        public PTemplate(String op, String template) {
-            this.op = op;
-            this.template = template;
-        }
-
-        String op;
-        String template;
-
-        public String getOp() {
-            return op;
-        }
-
-        public void setOp(String op) {
-            this.op = op;
-        }
-
-        public String getTemplate() {
-            return template;
-        }
-
-        public void setTemplate(String template) {
-            this.template = template;
-        }
-        public JSONObject toJSON(){
-            JSONObject json = new JSONObject();
-            json.put(getOp(), getTemplate());
-            return json;
-        }
-    }
     public static void main(String[] args) {
-        try {
-            testJSON();
-            return;
-        } catch (Exception x) {
-            x.printStackTrace();
+        Vector<String> vector = new Vector<>();
+        vector.add(DUMMY_FUNCTION); // Dummay zero-th arg.
+        for (String arg : args) {
+            vector.add(arg);
         }
-        SciTokensCLI oa2Commands = new SciTokensCLI(null);
-        SciTokensCommands sciTokensCommands = new SciTokensCommands(null);
+        InputLine argLine = new InputLine(vector); // now we have a bunch of utilities for this
+
+        // In order of importance for command line flags.
+
+        if (argLine.hasArg(SHORT_HELP_FLAG) || argLine.hasArg(LONG_HELP_FLAG)) {
+            SciTokensCLI sciTokensCLI = new SciTokensCLI(null); // no logging, just grab the help and exit;
+            sciTokensCLI.useHelp();
+            return;
+        }
+
+        boolean isVerbose = argLine.hasArg(SHORT_VERBOSE_FLAG) || argLine.hasArg(LONG_VERBOSE_FLAG);
+        // again, a batch file means every line in the file is a separate comamand, aside from comments
+        boolean hasBatchFile = argLine.hasArg(SciTokensCommands.BATCH_FILE_MODE_FLAG);
+        // Batch mode means that the command line is interpreted as a single command. This execeuts one command, batch mode does many.
+        boolean isBatchMode = argLine.hasArg(SciTokensCommands.BATCH_MODE_FLAG);
+       boolean isNoOuput = (argLine.hasArg(SHORT_NO_OUTPUT_FLAG) || argLine.hasArg(LONG_NO_OUTPUT_FLAG));
+
+        MyLoggingFacade myLoggingFacade = null;
+        if (argLine.hasArg("-log")) {
+            String logFileName = argLine.getNextArgFor("-log");
+            LoggerProvider loggerProvider = new LoggerProvider(logFileName,
+                    "SciTokensCLI logger", 1, 1000000, false, isVerbose, false);
+            myLoggingFacade = loggerProvider.get(); // if verbose
+        }
+
+        SciTokensCLI sciTokensCLI = new SciTokensCLI(myLoggingFacade);
+        sciTokensCLI.useHelp();
+        SciTokensCommands sciTokensCommands = new SciTokensCommands(myLoggingFacade);
+        sciTokensCommands.setVerbose(isVerbose);
+        sciTokensCommands.setPrintOuput(!isNoOuput);
         try {
             CLIDriver cli = new CLIDriver(sciTokensCommands);
+            // Easy case -- no arguments, so just start.
             if (args == null || args.length == 0) {
-                //oa2Commands.start(args);
-                oa2Commands.about();
+                sciTokensCLI.about();
                 cli.start();
                 return;
             }
             sciTokensCommands.setBatchMode(false);
-            // alternately, parse the arguments
-            if (args[0].equalsIgnoreCase("--help")) {
-                oa2Commands.useHelp();
+            if (argLine.hasArg(SciTokensCommands.BATCH_FILE_MODE_FLAG)) {
+                sciTokensCLI.processBatchFile(argLine.getNextArgFor(SciTokensCommands.BATCH_FILE_MODE_FLAG), cli);
                 return;
             }
+            if (argLine.hasArg(BATCH_MODE_FLAG)) {
+                sciTokensCLI.processBatchModeCommand(cli, args);
+            }
+            // alternately, parse the arguments
             String cmdLine = args[0];
             for (int i = 1; i < args.length; i++) {
-                if (args[i].equals(CommonCommands.BATCH_MODE_FLAG)) {
+                if (args[i].equals(BATCH_MODE_FLAG)) {
                     sciTokensCommands.setBatchMode(true);
                 } else {
                     // don't keep the batch flag in the final arguments.
@@ -283,6 +176,115 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
         }
     }
 
+    protected SciTokensCommands getSciTokensCommands(CLIDriver cli) {
+        for (Commands c : cli.getCLICommands()) {
+            if (c instanceof SciTokensCommands) {
+                return (SciTokensCommands) c;
+            }
+        }
+
+        return null;
+    }
+
+    protected void processBatchModeCommand(CLIDriver cli, String[] args) throws Exception {
+        SciTokensCommands sciTokensCommands = getSciTokensCommands(cli);
+        if (sciTokensCommands == null) {
+            throw new NFWException("Error: No SciTokensCommands configured, hence no logging.");
+        }
+        sciTokensCommands.setBatchMode(true);
+        // need to tease out the intended line to execute. The arg line looks like
+        // sciTokens -batch A B C
+        // so we need to drop the name of the function and the -batch flag.
+        String cmdLine = "";
+        for (String arg : args) {
+            if (!arg.equals(DUMMY_FUNCTION) && !arg.equals(SciTokensCommands.BATCH_FILE_MODE_FLAG)) {
+
+                cmdLine = cmdLine + " " + arg;
+            }
+        }
+        cli.execute(cmdLine);
+    }
+
+
+    protected void processBatchFile(String fileName, CLIDriver cli) throws Exception {
+        if(fileName == null || fileName.isEmpty()){
+            throw new FileNotFoundException("Error: The file name is missing.");
+        }
+        File file = new File(fileName);
+        if (!file.exists()) {
+            throw new FileNotFoundException("Error: The file \"" + fileName + "\" does not exist");
+        }
+        if (!file.isFile()) {
+            throw new FileNotFoundException("Error: The object \"" + fileName + "\" is not a file.");
+        }
+        if (!file.canRead()) {
+            throw new GeneralException("Error: Cannot read file \"" + fileName + "\". Please check your permissions.");
+        }
+        FileReader fis = new FileReader(file);
+        BufferedReader br = new BufferedReader(fis);
+        SciTokensCommands sciTokensCommands = getSciTokensCommands(cli);
+        if (sciTokensCommands == null) {
+            throw new NFWException("Error: No SciTokensCommands configured, hence no logging.");
+        }
+        sciTokensCommands.setBatchMode(true);
+        int lineNumber = 1;
+        String lineIn = br.readLine();  // actual lines in the file, comments and all
+        boolean isExecuteLine = false;
+
+        String executableLine = "";
+        while (lineIn != null) {
+            // strip comment
+            String fullLine = null;
+            if (-1 < lineIn.indexOf(SciTokensCommands.BATCH_FILE_COMMENT_CHAR)) {
+                fullLine = lineIn.substring(0, lineIn.indexOf(SciTokensCommands.BATCH_FILE_COMMENT_CHAR)).trim();
+            } else {
+                // no comment
+                fullLine = lineIn.trim();
+            }
+            if (fullLine.endsWith(SciTokensCommands.BATCH_FILE_LINE_CONTINUES)) {
+                fullLine = fullLine.substring(0, fullLine.lastIndexOf(SciTokensCommands.BATCH_FILE_LINE_CONTINUES));
+                isExecuteLine = false;
+            } else {
+                isExecuteLine = true;
+            }
+            executableLine = executableLine + " " + fullLine;
+
+            executableLine = executableLine.trim();
+            if (isExecuteLine) {
+                if (!executableLine.isEmpty()) {
+                    try {
+                        int rc = cli.execute(executableLine);
+                        switch (rc) {
+                            // Hint: The colons in the messages line up (more or less) so that the log file is very easily readable at a glance.
+                            case CLIDriver.ABNORMAL_RC:
+                                    sciTokensCommands.error("Error: line # " + lineNumber + ",  \"" + executableLine + "\"");
+                                break;
+                            case CLIDriver.HELP_RC:
+                                    sciTokensCommands.info("  Help: invoked at line #" + lineIn);
+                                break;
+                            case CLIDriver.OK_RC:
+                            default:
+                                if(sciTokensCommands.isVerbose()){
+                                    sciTokensCommands.info("    ok: \"" + executableLine + "\"");
+                                }
+                        }
+
+                    } catch (Throwable t) {
+                        sciTokensCommands.error(t, "Error executing batch file in line #" + lineIn);
+                    }
+                }
+                // reset state even if nothing executes at this point.
+                executableLine = "";
+                isExecuteLine = false;
+            }
+
+            lineIn = br.readLine();
+            lineNumber++;
+        }
+        br.close();
+
+
+    }
 
     protected void start(String[] args) throws Exception {
         about();

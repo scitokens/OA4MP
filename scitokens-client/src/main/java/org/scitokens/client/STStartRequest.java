@@ -10,10 +10,7 @@ import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * A simple servlet that starts the request. It will make the initial request and set an identifier
@@ -55,10 +52,14 @@ public class STStartRequest extends ClientServlet {
             }
         }
         System.err.println(getClass().getSimpleName() + ": setting scopes to " + newScopes);
-
         oa2ce.setScopes(newScopes);
+        String rawAudience = request.getParameter("audience");
+        HashMap<String,String> map = new HashMap<>();
+        map.put("audience", rawAudience);
 
-        gtwResp = getOA4MPService().requestCert(id);
+
+
+        gtwResp = getOA4MPService().requestCert(id, map);
 
         // if there is a store, store something in it.
         Cookie cookie = new Cookie(OA4MP_CLIENT_REQUEST_ID, id.getUri().toString());

@@ -107,44 +107,55 @@ public class STReadyServlet extends ClientServlet {
         JSONWebKeys jsonWebKeys = atServer2.getJsonWebKeys();
 
         boolean isVerified = false;
+        boolean isSciToken = false;
         try {
             JSONObject scitoken = SciTokensUtil.verifyAndReadJWT(rawAT, jsonWebKeys);
             request.setAttribute("st_payload", scitoken.toString(2));
             isVerified = true;
+            isSciToken = true;
         } catch (Throwable t) {
-            request.setAttribute("st_payload", "Error reading token:" + t.getMessage());
-
+            request.setAttribute("st_payload", rawAT );
+            isSciToken = false;
         }
         // we bit of formatting...
-        int width = 80;
-        String formattedToken = "";
-        for (int i = 0; i < rawAT.length() / width; i++) {
-            formattedToken = formattedToken + rawAT.substring(i * width, (i + 1) * width) + "\n";
-        }
-        if (0 != rawAT.length() % width) {
-            // if there is anything left over, append it, otherwise, skip this.
-            formattedToken = formattedToken + rawAT.substring(rawAT.length() - rawAT.length() % width);
-        }
+        if(isSciToken) {
+            int width = 80;
+            String formattedToken = "";
+            for (int i = 0; i < rawAT.length() / width; i++) {
+                formattedToken = formattedToken + rawAT.substring(i * width, (i + 1) * width) + "\n";
+            }
+            if (0 != rawAT.length() % width) {
+                // if there is anything left over, append it, otherwise, skip this.
+                formattedToken = formattedToken + rawAT.substring(rawAT.length() - rawAT.length() % width);
+            }
 
-        request.setAttribute("accessToken", formattedToken);
-        String[] atParts = SciTokensUtil.decat(rawAT);
-        String h = atParts[SciTokensUtil.HEADER_INDEX];
-        JSONObject header = null;
+            request.setAttribute("accessToken", formattedToken);
+            String[] atParts = SciTokensUtil.decat(rawAT);
+            String h = atParts[SciTokensUtil.HEADER_INDEX];
+            JSONObject header = null;
 
-        String p = atParts[SciTokensUtil.PAYLOAD_INDEX];
-        try {
-            header = JSONObject.fromObject(new String(Base64.decodeBase64(h)));
-            request.setAttribute("st_accessToken2", atResponse2.getAccessToken().getToken());
-            request.setAttribute("st_accessToken", formattedToken);
-            request.setAttribute("st_header", header.toString(2));
-            request.setAttribute("st_verified", Boolean.toString(isVerified));
-            JSONWebKey webKey = jsonWebKeys.get(header.get(SciTokensUtil.KEY_ID));
-            String keyPEM = KeyUtil.toX509PEM(webKey.publicKey);
-            request.setAttribute("st_public_key", keyPEM);
+            String p = atParts[SciTokensUtil.PAYLOAD_INDEX];
+            try {
+                header = JSONObject.fromObject(new String(Base64.decodeBase64(h)));
+                request.setAttribute("st_accessToken2", atResponse2.getAccessToken().getToken());
+                request.setAttribute("st_accessToken", formattedToken);
+                request.setAttribute("st_header", header.toString(2));
+                request.setAttribute("st_verified", Boolean.toString(isVerified));
+                JSONWebKey webKey = jsonWebKeys.get(header.get(SciTokensUtil.KEY_ID));
+                String keyPEM = KeyUtil.toX509PEM(webKey.publicKey);
+                request.setAttribute("st_public_key", keyPEM);
 
-        }catch(Throwable t){
-            getMyLogger().warn("Error decoding header from response", t);
-            System.err.println("Returned raw AT=" + rawAT);
+            } catch (Throwable t) {
+                getMyLogger().warn("Error decoding header from response", t);
+                System.err.println("Returned raw AT=" + rawAT);
+            }
+        }else{
+            // The server is not configured to return a SciToken at the first step, so just print this out.
+                 request.setAttribute("st_accessToken2", rawAT);
+                 request.setAttribute("st_accessToken", rawAT);
+                 request.setAttribute("st_header", "(none)");
+                 request.setAttribute("st_verified", "(n/a)");
+                 request.setAttribute("st_public_key", "(n/a)");
         }
 
 

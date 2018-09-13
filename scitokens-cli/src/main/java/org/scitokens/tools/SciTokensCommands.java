@@ -27,7 +27,91 @@ import static edu.uiuc.ncsa.security.oauth_2_0.JWTUtil.decat;
  * on 9/6/17 at  3:47 PM
  */
 public class SciTokensCommands extends CommonCommands {
+    // TODO: Move batch file and all other functionality here up to CommonCommands!  Be sure to update SciTokensCLI accordingly since it uses it.
 
+    /**
+     * If this is used, then each line of the file is read as an input and processed. It overrides the
+     * {@link #BATCH_MODE_FLAG} if used and that is ignored.
+     */
+    public static String BATCH_FILE_MODE_FLAG = "-batchFile";
+    /**
+     * If a line contains this character, then the line is truncated at that point before processing.
+     */
+    public static String BATCH_FILE_COMMENT_CHAR = "//";
+    /**
+     * If a line ends with this (after the comment is removed), then glow it on to the
+     * next input line. In effect this lets you split commands across multiple lines, e.g.
+     * <pre>
+     * ls \//My comment
+     * -la \
+     * foobar
+     * </pre>
+     * is the same as entering the single line
+     * <pre>ls -la foobar</pre>
+     * Notice that the lines are concatenated and the comment is stripped out.
+     */
+    public static String BATCH_FILE_LINE_CONTINUES = "\\";
+
+    public boolean isBatchFile() {
+        return batchFile;
+    }
+
+    public void setBatchFile(boolean batchFile) {
+        this.batchFile = batchFile;
+    }
+
+    protected boolean batchFile = false;
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    /**
+     * So batch files can change whether or not they are verbose
+     *
+     * @param inputLine
+     */
+    public void set_verbose(InputLine inputLine) throws Exception {
+        if (inputLine.hasArg("true")) {
+            setVerbose(true);
+        } else {
+            setVerbose(false);
+        }
+    }
+
+    public void set_no_output(InputLine inputLine) throws Exception {
+        // A little bit trickier than it looks since we have an internal flag for the negation of this.
+        // We also want to be sure they really want to turn off output, so we only test for logical true
+        // That way if they screw it up they still at least get output...
+        if (inputLine.hasArg("true")) {
+            setPrintOuput(false);
+        } else {
+            setPrintOuput(true);
+        }
+    }
+
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    boolean verbose;
+
+    /**
+     * If this is set true, then no output is generated. This is usedul in batch mode or with a batch file.
+     *
+     * @return
+     */
+    public boolean isPrintOuput() {
+        return printOuput;
+    }
+
+    public void setPrintOuput(boolean printOuput) {
+        this.printOuput = printOuput;
+    }
+
+    boolean printOuput = true; // default is to always print output since this a command line tool.
+    // END OF Batch File processing stuff.
 
     public SciTokensCommands(MyLoggingFacade logger) {
         super(logger);
@@ -41,25 +125,43 @@ public class SciTokensCommands extends CommonCommands {
     public static String JWK_EXTENSION = "jwk";
 
     public void create_keys(InputLine inputLine) throws Exception {
-        SigningCommands sg = new SigningCommands(null);
+        SigningCommands sg = new STSigningCommands(null);
+        sg.setBatchMode(isBatchMode());
         sg.create(inputLine);
-
     }
 
     JSONWebKeys keys = null;
 
     String wellKnown = null;
 
-    public void set_well_known(InputLine inputLine) throws Exception {
-
+    public void print_well_known(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            printWellKnownHelp();
+            return;
+        }
+        if (wellKnown == null || wellKnown.isEmpty()) {
+            say("(not set)");
+            return;
+        }
+        say("well known URL=\"" + wellKnown + "\"");
     }
+
+    protected void printWellKnownHelp() {
+        say("print_well_known: Prints the well-known URL that has been set.");
+        say("                  Note that you set it in the set_keys call if you supply its URL");
+        say("                  The well-known URL resides on a server and has the public keys listed");
+        say("                  While you can validate a signature against it, you cannot create one since");
+        say("                  the private key is never available through the well-knwon file.");
+        say("Related: set_keys, validate_token");
+    }
+
 
     protected void setKeysHelp() {
         say("set_keys: [-file filename | uri]");
         say("          Set the keys used for signing and validation in this session.");
         say("          Either supplied a fully qualified path to the file or a uri. If you pass nothing");
         say("          yo will be prompted for a file. You can invoke this at any to change the keys.");
-        say("  Related: create_keys");
+        say("  Related: create_keys, set_default_id");
     }
 
     /**
@@ -74,12 +176,12 @@ public class SciTokensCommands extends CommonCommands {
             return;
         }
         File f = null;
-        if(inputLine.size() ==1){
+        if (inputLine.size() == 1) {
             boolean getFile = getBooleanInput("Did you want to enter a file name?");
-            if(getFile){
-               String fileName = getInput("Enter file name");
-               f = new File(fileName);
-            }else{
+            if (getFile) {
+                String fileName = getInput("Enter file name");
+                f = new File(fileName);
+            } else {
                 return;
             }
         }
@@ -91,7 +193,7 @@ public class SciTokensCommands extends CommonCommands {
                 return;
             }
         }
-        if(f != null){
+        if (f != null) {
             // got a file from some place. Rock on.
             keys = readKeys(f);
             if (defaultKeyID != null) {
@@ -117,12 +219,22 @@ public class SciTokensCommands extends CommonCommands {
 
     @Override
     protected void say(String x) {
-        // suppress output if this is run from the command line.
-        if (!isBatchMode()) {
+        if (isPrintOuput()) {
             super.say(x);
         }
     }
 
+    /**
+     * Use this for verbose mode.
+     *
+     * @param x
+     */
+    protected void vSay(String x) {
+        // suppress output if this is run from the command line.
+        if (isPrintOuput() && isVerbose()) {
+            super.say(x);
+        }
+    }
 
     protected void versionHelp() {
         sayi("version - prints the current version number of this program.");
@@ -137,7 +249,7 @@ public class SciTokensCommands extends CommonCommands {
     }
 
     protected void listKeysHelp() {
-        say("list_keys:This will list all the public keys in the key file in pem format.");
+        say("list_keys [file]:This will list all the public keys in the key file in pem format.");
         say("           Each key will be preceeded by its unique ID in the key file.");
         say("           You may invoke this with no argument, in which case the default key file");
         say("           as set in the set_keys command will be used, or you can supply a fully qualified");
@@ -218,6 +330,10 @@ public class SciTokensCommands extends CommonCommands {
      * @throws Exception
      */
     public void create_claims(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            printCreateClaimsHelp();
+            return;
+        }
         say("Enter a key then a value when prompted. You can enter multiple values separated by commas");
         say("Just hit return (no value) to exit");
         boolean isDone = false;
@@ -229,20 +345,20 @@ public class SciTokensCommands extends CommonCommands {
                 continue;
             }
             String value = getInput("Enter value. multiple values should be comma separated");
-            try{
+            try {
                 // try JSON first
                 JSON json = JSONObject.fromObject(value);
                 jsonObject.put(key, json);
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 // plan B. Did they give us a comma separated list we are to parse?
                 if (0 < value.indexOf(",")) {
-                 StringTokenizer st = new StringTokenizer(value, ",");
-                 JSONArray array = new JSONArray();
-                 while (st.hasMoreTokens()) {
-                     array.add(st.nextToken());
-                 }
-                 jsonObject.put(key, array);
-             } else {
+                    StringTokenizer st = new StringTokenizer(value, ",");
+                    JSONArray array = new JSONArray();
+                    while (st.hasMoreTokens()) {
+                        array.add(st.nextToken());
+                    }
+                    jsonObject.put(key, array);
+                } else {
                     // ok, nothing works, it's just a string...
                     jsonObject.put(key, value);
 
@@ -259,7 +375,7 @@ public class SciTokensCommands extends CommonCommands {
             if (f.exists()) {
                 String overwrite = getInput("This file exists. Do you want to overwrite it?", "false");
                 if (!Boolean.parseBoolean(overwrite)) {
-                     return;
+                    return;
                 }
             }
             String output = jsonObject.toString(2);
@@ -299,7 +415,7 @@ public class SciTokensCommands extends CommonCommands {
 
     public void set_default_id(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            createTokenHelp();
+            printSetDefaultIDHelp();
             return;
         }
         if (1 < inputLine.size()) {
@@ -313,6 +429,23 @@ public class SciTokensCommands extends CommonCommands {
         }
         defaultKeyID = x;
 
+    }
+
+    protected void printPrintDefaultIDHelp() {
+        say("print_default_id: This will print the current default key id that is to be used for all signing and verification.");
+        say("Related: set_default_id");
+    }
+
+    public void print_default_id(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            printSetDefaultIDHelp();
+            return;
+        }
+        if (defaultKeyID == null || defaultKeyID.isEmpty()) {
+            say("(not set)");
+            return;
+        }
+        say("default key id=\"" + defaultKeyID + "\"");
     }
 
     protected void printParseClaimsHelp() {
@@ -378,24 +511,16 @@ public class SciTokensCommands extends CommonCommands {
      * @return
      */
     protected String getArgValue(InputLine inputLine, String key) {
-        int index = inputLine.indexOf(key);
-        if (index == -1) return null;
-        // Remember that the input line has the name of the method as the zeroth argument, so
-        // it is always at least 1 in length
-        if (inputLine.size() + 1 == index) {
-            //then this is the final argument and nothing follows
-            return null;
-        }
-        return inputLine.getArg(index + 1);
+        return inputLine.getNextArgFor(key);
     }
 
     protected void createTokenHelp() {
-        say("create_token [-file claims -keys keyfile -keyid id]");
+        say("create_token -file claims [-keys keyfile -keyid id -out outputFile]");
         say("              This will take the current keys (uses default) and a file containing a JSON");
         say("              format set of claims. It will then sign the claims with the right headers etc.");
-        say("              and print out the resulting JWT to the console. Any of the arguments omitted will cause you");
+        say("              and optionally print out the resulting JWT to the console. Any of the arguments omitted will cause you");
         say("              to be prompted. If you have already set the key and keyid these will be used.");
-        say("");
+        say("              If the output file is given, the token will be written there instead.");
         say("Related: set_keys, set_default_id, print_token");
     }
 
@@ -407,6 +532,10 @@ public class SciTokensCommands extends CommonCommands {
             return;
         }
         // pull off the command line arguments
+        File outputFile = null;
+        if(inputLine.hasArg("-outputFile")){
+            outputFile = new File(inputLine.getNextArgFor("-outputFile"));
+        }
 
         JSONWebKeys localKeys = null;
         if (inputLine.hasArg("-keys")) {
@@ -464,7 +593,14 @@ public class SciTokensCommands extends CommonCommands {
         }
         String signedToken = SciTokensUtil.createJWT(claims, localKeys.get(localDefaultID));
         lastToken = signedToken;
-        say(signedToken);
+        if(outputFile == null) {
+            say(signedToken);
+        }else{
+            FileWriter fileWriter = new FileWriter(outputFile);
+            fileWriter.write(signedToken);
+            fileWriter.flush();
+            fileWriter.close();
+        }
     }
 
     protected void printTokenHelp() {
@@ -528,9 +664,12 @@ public class SciTokensCommands extends CommonCommands {
     }
 
     protected void printValidateTokenHelp() {
-        say("validate_token [-file filename] | string");
+        say("validate_token [-wellKnown url | -keyFile file -file filename  | string]");
         say("         This will take a token and check the signature. It will also print out the payload");
         say("         and header information.");
+        say("         The validation is against the current set of keys or against a URL specified with the");
+        say("         -wellKnown flag. You can also point to a key file (file with JSON web keys in it) with");
+        say("         the -keyFile flag.");
         say("         You may supply either the token itself or specify with the -file flag that this is in a file.");
         say("   related: create_token");
     }
@@ -546,19 +685,50 @@ public class SciTokensCommands extends CommonCommands {
             return;
         }
         if (inputLine.hasArg("-file")) {
-            token = getArgValue(inputLine, "-file");
+            token = inputLine.getNextArgFor("-file");
         } else {
-            token = inputLine.getArg(1);
+            token = inputLine.getLastArg();
+        }
+        JSONWebKeys keys = this.keys;
+        if (inputLine.hasArg("-wellKnown")) {
+            String wellKnown = inputLine.getNextArgFor("-wellKnown");
+            try {
+                keys = SciTokensUtil.getJsonWebKeys(new ServiceClient(URI.create("https://scitokens.org")), wellKnown);
+            } catch (Throwable t) {
+                sayi("Sorry, could not parse the url: \"" + wellKnown + "\". Message=\"" +  t.getMessage() + "\"");
+            }
+        }
+        if(inputLine.hasArg("-keyFile") && !inputLine.hasArg("-wellKnown")){ // only take one if both are specified and well known is preferred
+            File f = new File(inputLine.getNextArgFor("-keyFile"));
+            if(!f.exists()){
+                say("Sorry, the file " + f + " does not exist");
+                return;
+            }
+            try{
+                keys = readKeys(f);
+            }catch(Throwable t){
+                sayi("Sorry, could not load the file: \"" + inputLine.getNextArgFor("-keyFile") + "\". Message=\"" +  t.getMessage() + "\"");
+            }
+        }
+        if(keys == null){
+            say("Sorry, no keys set, please set keys or specify a well-known URL");
+            return;
         }
         String[] x = decat(token);
         JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[0])));
         JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[1])));
         say("header=" + h);
         say("payload=" + p);
-        if (SciTokensUtil.verify(h, p, x[2], keys.get(defaultKeyID))) {
+        if (SciTokensUtil.verify(h, p, x[2], keys.get(h.getString("kid")))) {
             say("token valid!");
         } else {
             say("could not validate token");
+        }
+    }
+
+    public void error(Throwable t, String message) {
+        if (logger != null) {
+            logger.error(message, t);
         }
     }
 }

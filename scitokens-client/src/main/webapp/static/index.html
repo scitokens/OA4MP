@@ -15,10 +15,13 @@ be more than an example.<br><br>
     <br>
     <textarea id="scopes" rows="5" cols="80" name="scopes"></textarea>
     <br>
+    The audience for the requested scopes:<br>
+    <input type="text" size="25" name="audience"/>
+    <br>
     <td><input type="submit" value="start"/></td>
 </form>
 
-Note that this sample server supports the following test groups:
+Note that this sample client supports the following test groups:
 <ul>
     <li>asgaard</li>
     <li>aesir</li>
@@ -41,7 +44,8 @@ that nicely handles the embedded drive. This is why uris are a good thing here.
 <h2>A note on using older requests</h2>
 These are of the form action:path (e.g. read:/home/area51/thor). You may request these
 and they will be converted internally into the expected request format of<br/>
-<pre><b>scitokens:/scopes?</b>action<b>#file:///</b>path</pre> <br/>
+<pre><b>scitokens:/scopes?</b>action<b>#file:///</b>path</pre>
+<br/>
 so that this is implicitly a file on the local system (remember that a file uri
 that starts file:///... is equivalent to file://localhost/...).
 
