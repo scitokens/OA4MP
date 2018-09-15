@@ -1,0 +1,35 @@
+# Run the SciTokens client (a command line interface client). This allows you to check the complete
+# lifecycle of getting a tokens, refresh tokens, token exchange and user info from the command line -- almost.
+# There is a manual step for authentication that is required for the oauth flow.
+# Invoke with --help for more information.
+#
+# The next 5 entries completely determine how this operates. Change these to whatever you want if
+# different from the standard install.
+
+SCI_TOKEN_ROOT=/opt/scitokens
+DEFAULT_CONFIG=$SCI_TOKEN_ROOT/etc/admin-cfg.xml
+DEFAULT_TARGET=client
+clientJar=$SCI_TOKEN_ROOT/lib/scitoken-client.jar
+logFile=$SCI_TOKEN_ROOT/var/log/scitoken-client.log
+
+# End of user serviceable parts.
+
+if [[  "$1" = "--help" || $# -gt 2 ]];then
+  echo "scitoken-client [configName configFile"]
+  echo "Start the SciToken command line client with the"
+  echo "given configuration name in the given configuration file (full path)."
+  echo "No arguments means to use the config named '$DEFAULT_TARGET' in the file  '$DEFAULT_CONFIG'"
+  echo "One argument is assumed to be the configuration name in the default config file."
+  exit 1
+fi
+
+target=${1:-$DEFAULT_TARGET}
+adminCfg=${2:-$DEFAULT_CONFIG}
+
+java  -jar $clientJar   -cfg $adminCfg -name $target -log $logFile -v
+
+if [ $? != 0 ]; then
+  exit 1
+fi
+
+exit 0

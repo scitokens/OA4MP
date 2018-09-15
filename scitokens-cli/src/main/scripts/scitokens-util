@@ -1,0 +1,31 @@
+# Runs the SciTokens utility from the command line. This may also be used to invoke the batch
+# facility there. 
+# The next 4 entries completely determine how this operates. Change these to whatever you want if
+# different from the standard install.
+
+SCI_TOKENS_ROOT=/opt/scitokens
+DEFAULT_CONFIG=$SCI_TOKENS_ROOT/etc/admin-cfg.xml
+cliJar=$SCI_TOKENS_ROOT/lib/scitokens-util.jar
+DEFAULT_LOGFILE=$SCI_TOKENS_ROOT/var/log/scitokens-util.log
+
+# End of user serviceable parts.
+
+if [[  "$1" = "--help" ]];then
+  echo "scitokens-cli [args]"
+  echo "Start the SciTokens command line utility with the"
+  echo "given arguments"
+  echo "To get help on the supported methods, start it (invoke with no arguments) and type --help"
+  exit 1
+fi
+
+
+logfile=${1:-$DEFAULT_LOGFILE}
+
+# java -jar $cliJar  -log $logfile $2 $3 $4 $5 $6 $7 $8 $9
+java -jar $cliJar  "$@"
+
+if [ $? != 0 ]; then
+  exit 1
+fi
+
+exit 0

@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.OA2SQLTStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
@@ -37,11 +38,15 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.EXPIRATION;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.ISSUED_AT;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.ISSUER;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.IS_MEMBER_OF;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.NOT_VALID_BEFORE;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
 import static org.scitokens.util.PermissionResolver.ST_GROUP_NAME;
 import static org.scitokens.util.PermissionResolver.ST_USER_NAME;
 import static org.scitokens.util.SciTokensClaims.*;
-import static org.scitokens.util.SciTokensClaims.ST_CLIENT_IDENTIFIER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -254,7 +259,7 @@ public class STATServlet extends OA2ATServlet implements TokenExchangeConstants 
         return templates;
     }
 
-    protected AuthorizationTemplates getTestTemplates(){
+    protected AuthorizationTemplates getTestTemplates() {
         String audience = "https://demo.lsst.org";
         AuthorizationTemplates ats = new AuthorizationTemplates();
         LinkedList<AuthorizationPath> aps = new LinkedList<>();
@@ -262,7 +267,7 @@ public class STATServlet extends OA2ATServlet implements TokenExchangeConstants 
         aps.add(ap);
         ap = new AuthorizationPath(CLAIM_OPERATION_WRITE, "/home/${user}");
         aps.add(ap);
-        AuthorizationTemplate at = new AuthorizationTemplate(audience,aps);
+        AuthorizationTemplate at = new AuthorizationTemplate(audience, aps);
         ats.put(at);
         System.err.println("Authorization templates:");
         System.err.println(ats.toJSON().toString(2));
@@ -286,10 +291,35 @@ public class STATServlet extends OA2ATServlet implements TokenExchangeConstants 
 
         AuthorizationTemplates ats = stClient.getAuthorizationTemplates();
         JSONObject claims = stTransaction.getClaims();
-               Groups groups = null;
-               if (claims.containsKey(IS_MEMBER_OF)) {
-                   groups = (Groups) claims.get(IS_MEMBER_OF);
-               }
+        Groups groups = null;
+        if (claims.containsKey(IS_MEMBER_OF)) {
+            // The point of this block is that there is an is member of claim, but there may be an issue with it.
+            // At least a fair bit of this is written with future proofing in mind, so that if something changes
+            // there will be an error generated.
+            Object rawGroups = claims.get(IS_MEMBER_OF);
+            if (rawGroups instanceof String) {
+                groups = new Groups();
+                try {
+                    JSONArray array = JSONArray.fromObject(rawGroups);
+                    groups.fromJSON(array);
+                } catch (Throwable t) {
+                    DebugUtil.dbg(this, "Attempts to interpret group as JSONArray, but was not in the correct format:\n\"" + rawGroups + "\"");
+                    // so no groups.
+                }
+            }
+            if (rawGroups instanceof Groups) {
+                groups = (Groups) rawGroups;
+            }
+            if (rawGroups instanceof JSONArray) {
+                groups = new Groups();
+                groups.fromJSON((JSONArray) rawGroups);
+            }
+            if (groups == null) {
+                throw new NFWException("Unrecognized group structure for class \"" + rawGroups.getClass().getSimpleName() + " = \"" + rawGroups + "\"");
+            }
+        }else{
+            groups = new Groups(); // so no null pointer exception.
+        }
         if (!isEmpty(stse.getIssuer())) {
             sciTokens.put(ISSUER, stse.getIssuer());
         } else {
@@ -306,25 +336,25 @@ public class STATServlet extends OA2ATServlet implements TokenExchangeConstants 
         TemplateResolver templateResolver = new TemplateResolver(claims.getString(SUBJECT), groups);
         LinkedList<String> requestedPermissions = new LinkedList<>();
         StringTokenizer st = new StringTokenizer(stTransaction.getStScopes(), " ");
-        while(st.hasMoreElements()){
+        while (st.hasMoreElements()) {
             requestedPermissions.add(st.nextToken());
         }
         HashMap<String, List<String>> permissions = new HashMap<>();
-        for(String aud: stTransaction.getAudience()){
+        for (String aud : stTransaction.getAudience()) {
             List<String> tempP = templateResolver.resolve(ats, aud, requestedPermissions);
-            if(!tempP.isEmpty()){
+            if (!tempP.isEmpty()) {
                 permissions.put(aud, tempP);
             }
         }
-       if(permissions.isEmpty()){
-           throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "No permissions resulted from this request. ", HttpStatus.SC_BAD_REQUEST);
-       }
+        if (permissions.isEmpty()) {
+            throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "No permissions resulted from this request. ", HttpStatus.SC_BAD_REQUEST);
+        }
         // now we have to craft the response.
         String audiences = "";
         String pString = "";
-        for(String aud : permissions.keySet()){
+        for (String aud : permissions.keySet()) {
             audiences = audiences + " " + aud;
-            for(String p : permissions.get(aud)){
+            for (String p : permissions.get(aud)) {
                 pString = pString + " " + p;
             }
         }

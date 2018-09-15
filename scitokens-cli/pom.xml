@@ -96,7 +96,7 @@
             </build>
         </profile>
         <profile>
-            <id>scitokens-cli</id>
+            <id>scitokens-util</id>
             <build>
                 <plugins>
                     <plugin>
@@ -105,13 +105,13 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>org.scitokens.tools.SciTokensCLI</mainClass>
+                                    <mainClass>org.scitokens.tools.SciTokensUtil</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>scitokens-cli</finalName>
+                            <finalName>scitokens-util</finalName>
 
                         </configuration>
                         <executions>

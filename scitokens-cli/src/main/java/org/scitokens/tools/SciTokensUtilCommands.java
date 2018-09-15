@@ -26,8 +26,8 @@ import static edu.uiuc.ncsa.security.oauth_2_0.JWTUtil.decat;
  * <p>Created by Jeff Gaynor<br>
  * on 9/6/17 at  3:47 PM
  */
-public class SciTokensCommands extends CommonCommands {
-    // TODO: Move batch file and all other functionality here up to CommonCommands!  Be sure to update SciTokensCLI accordingly since it uses it.
+public class SciTokensUtilCommands extends CommonCommands {
+    // TODO: Move batch file and all other functionality here up to CommonCommands!  Be sure to update SciTokensUtil accordingly since it uses it.
 
     /**
      * If this is used, then each line of the file is read as an input and processed. It overrides the
@@ -113,7 +113,7 @@ public class SciTokensCommands extends CommonCommands {
     boolean printOuput = true; // default is to always print output since this a command line tool.
     // END OF Batch File processing stuff.
 
-    public SciTokensCommands(MyLoggingFacade logger) {
+    public SciTokensUtilCommands(MyLoggingFacade logger) {
         super(logger);
     }
 

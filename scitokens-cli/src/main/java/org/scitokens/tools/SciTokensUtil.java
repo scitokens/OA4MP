@@ -20,8 +20,8 @@ import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
  * <p>Created by Jeff Gaynor<br>
  * on 9/5/17 at  3:31 PM
  */
-public class SciTokensCLI extends ConfigurableCommandsImpl {
-    public SciTokensCLI(MyLoggingFacade logger) {
+public class SciTokensUtil extends ConfigurableCommandsImpl {
+    public SciTokensUtil(MyLoggingFacade logger) {
         super(logger);
     }
 
@@ -89,7 +89,7 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
         say(SHORT_NO_OUTPUT_FLAG + ", " +LONG_NO_OUTPUT_FLAG + " = turn off all output");
         say("   You can set this in a batch file by invoking set_no_ouput true|false");
         say(BATCH_MODE_FLAG + "= interpret everything else on the command line as a command, aside from flags. Note this means you can execute a single command.");
-        say(SciTokensCommands.BATCH_FILE_MODE_FLAG + "= this is the fully qualified path to a file of commands which will be interpreted one after the other.");
+        say(SciTokensUtilCommands.BATCH_FILE_MODE_FLAG + "= this is the fully qualified path to a file of commands which will be interpreted one after the other.");
     }
 
 
@@ -115,29 +115,29 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
         // In order of importance for command line flags.
 
         if (argLine.hasArg(SHORT_HELP_FLAG) || argLine.hasArg(LONG_HELP_FLAG)) {
-            SciTokensCLI sciTokensCLI = new SciTokensCLI(null); // no logging, just grab the help and exit;
+            SciTokensUtil sciTokensCLI = new SciTokensUtil(null); // no logging, just grab the help and exit;
             sciTokensCLI.useHelp();
             return;
         }
 
         boolean isVerbose = argLine.hasArg(SHORT_VERBOSE_FLAG) || argLine.hasArg(LONG_VERBOSE_FLAG);
         // again, a batch file means every line in the file is a separate comamand, aside from comments
-        boolean hasBatchFile = argLine.hasArg(SciTokensCommands.BATCH_FILE_MODE_FLAG);
+        boolean hasBatchFile = argLine.hasArg(SciTokensUtilCommands.BATCH_FILE_MODE_FLAG);
         // Batch mode means that the command line is interpreted as a single command. This execeuts one command, batch mode does many.
-        boolean isBatchMode = argLine.hasArg(SciTokensCommands.BATCH_MODE_FLAG);
+        boolean isBatchMode = argLine.hasArg(SciTokensUtilCommands.BATCH_MODE_FLAG);
        boolean isNoOuput = (argLine.hasArg(SHORT_NO_OUTPUT_FLAG) || argLine.hasArg(LONG_NO_OUTPUT_FLAG));
 
         MyLoggingFacade myLoggingFacade = null;
         if (argLine.hasArg("-log")) {
             String logFileName = argLine.getNextArgFor("-log");
             LoggerProvider loggerProvider = new LoggerProvider(logFileName,
-                    "SciTokensCLI logger", 1, 1000000, false, isVerbose, false);
+                    "SciTokensUtil logger", 1, 1000000, false, isVerbose, false);
             myLoggingFacade = loggerProvider.get(); // if verbose
         }
 
-        SciTokensCLI sciTokensCLI = new SciTokensCLI(myLoggingFacade);
+        SciTokensUtil sciTokensCLI = new SciTokensUtil(myLoggingFacade);
         sciTokensCLI.useHelp();
-        SciTokensCommands sciTokensCommands = new SciTokensCommands(myLoggingFacade);
+        SciTokensUtilCommands sciTokensCommands = new SciTokensUtilCommands(myLoggingFacade);
         sciTokensCommands.setVerbose(isVerbose);
         sciTokensCommands.setPrintOuput(!isNoOuput);
         try {
@@ -149,8 +149,8 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
                 return;
             }
             sciTokensCommands.setBatchMode(false);
-            if (argLine.hasArg(SciTokensCommands.BATCH_FILE_MODE_FLAG)) {
-                sciTokensCLI.processBatchFile(argLine.getNextArgFor(SciTokensCommands.BATCH_FILE_MODE_FLAG), cli);
+            if (argLine.hasArg(SciTokensUtilCommands.BATCH_FILE_MODE_FLAG)) {
+                sciTokensCLI.processBatchFile(argLine.getNextArgFor(SciTokensUtilCommands.BATCH_FILE_MODE_FLAG), cli);
                 return;
             }
             if (argLine.hasArg(BATCH_MODE_FLAG)) {
@@ -176,10 +176,10 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
         }
     }
 
-    protected SciTokensCommands getSciTokensCommands(CLIDriver cli) {
+    protected SciTokensUtilCommands getSciTokensCommands(CLIDriver cli) {
         for (Commands c : cli.getCLICommands()) {
-            if (c instanceof SciTokensCommands) {
-                return (SciTokensCommands) c;
+            if (c instanceof SciTokensUtilCommands) {
+                return (SciTokensUtilCommands) c;
             }
         }
 
@@ -187,9 +187,9 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
     }
 
     protected void processBatchModeCommand(CLIDriver cli, String[] args) throws Exception {
-        SciTokensCommands sciTokensCommands = getSciTokensCommands(cli);
+        SciTokensUtilCommands sciTokensCommands = getSciTokensCommands(cli);
         if (sciTokensCommands == null) {
-            throw new NFWException("Error: No SciTokensCommands configured, hence no logging.");
+            throw new NFWException("Error: No SciTokensUtilCommands configured, hence no logging.");
         }
         sciTokensCommands.setBatchMode(true);
         // need to tease out the intended line to execute. The arg line looks like
@@ -197,7 +197,7 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
         // so we need to drop the name of the function and the -batch flag.
         String cmdLine = "";
         for (String arg : args) {
-            if (!arg.equals(DUMMY_FUNCTION) && !arg.equals(SciTokensCommands.BATCH_FILE_MODE_FLAG)) {
+            if (!arg.equals(DUMMY_FUNCTION) && !arg.equals(SciTokensUtilCommands.BATCH_FILE_MODE_FLAG)) {
 
                 cmdLine = cmdLine + " " + arg;
             }
@@ -222,9 +222,9 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
         }
         FileReader fis = new FileReader(file);
         BufferedReader br = new BufferedReader(fis);
-        SciTokensCommands sciTokensCommands = getSciTokensCommands(cli);
+        SciTokensUtilCommands sciTokensCommands = getSciTokensCommands(cli);
         if (sciTokensCommands == null) {
-            throw new NFWException("Error: No SciTokensCommands configured, hence no logging.");
+            throw new NFWException("Error: No SciTokensUtilCommands configured, hence no logging.");
         }
         sciTokensCommands.setBatchMode(true);
         int lineNumber = 1;
@@ -235,14 +235,14 @@ public class SciTokensCLI extends ConfigurableCommandsImpl {
         while (lineIn != null) {
             // strip comment
             String fullLine = null;
-            if (-1 < lineIn.indexOf(SciTokensCommands.BATCH_FILE_COMMENT_CHAR)) {
-                fullLine = lineIn.substring(0, lineIn.indexOf(SciTokensCommands.BATCH_FILE_COMMENT_CHAR)).trim();
+            if (-1 < lineIn.indexOf(SciTokensUtilCommands.BATCH_FILE_COMMENT_CHAR)) {
+                fullLine = lineIn.substring(0, lineIn.indexOf(SciTokensUtilCommands.BATCH_FILE_COMMENT_CHAR)).trim();
             } else {
                 // no comment
                 fullLine = lineIn.trim();
             }
-            if (fullLine.endsWith(SciTokensCommands.BATCH_FILE_LINE_CONTINUES)) {
-                fullLine = fullLine.substring(0, fullLine.lastIndexOf(SciTokensCommands.BATCH_FILE_LINE_CONTINUES));
+            if (fullLine.endsWith(SciTokensUtilCommands.BATCH_FILE_LINE_CONTINUES)) {
+                fullLine = fullLine.substring(0, fullLine.lastIndexOf(SciTokensUtilCommands.BATCH_FILE_LINE_CONTINUES));
                 isExecuteLine = false;
             } else {
                 isExecuteLine = true;
