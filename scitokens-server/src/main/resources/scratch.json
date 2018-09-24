@@ -23,8 +23,7 @@
                   {
                     "$if": ["$true"],
                     "$then": [
-                      {"$exclude": ["foo"]},
-                      {"$set": ["sub",{"$get": ["eppn"]}]}
+                      {"$exclude": ["foo"]}
                     ]
                   }
                 ],
@@ -71,7 +70,7 @@
       }
     ],
     "postProcessing":[
-      {"$if": ["$true"],
+      {"$if": [{"$equals":[{"$get": ["idp"]},"https://idp.ncsa.illinois.edu/idp/shibboleth"]}],
        "$then": [{"$set":["sub",
          {"$drop": ["@ncsa.illinois.edu",{"$get":["eppn"]}]}
        ]}]
@@ -85,6 +84,8 @@
       "aud": "https://demo.scitokens.org/xrootd",
       "paths":
       [
+            {"operation": "read","path": "/public/**"},
+            {"operation": "write","path": "/public/**"},
             {"operation": "read","path": "/home/${user}/**"},
             {"operation": "write","path": "/home/${user}/**"},
             {"operation": "queue","path": "/home/${user}/queueit/**"},

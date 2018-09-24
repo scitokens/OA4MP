@@ -24,6 +24,8 @@ import java.util.*;
  */
 public class STStartRequest extends ClientServlet {
     public static final String SCOPE_CAPUT = "demo:";
+    // as per https://tools.ietf.org/html/draft-ietf-oauth-resource-indicators-00
+    public static final String RESOURCE_KEY = "resource:";
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
@@ -53,9 +55,9 @@ public class STStartRequest extends ClientServlet {
         }
         System.err.println(getClass().getSimpleName() + ": setting scopes to " + newScopes);
         oa2ce.setScopes(newScopes);
-        String rawAudience = request.getParameter("audience");
+        String rawAudience = request.getParameter(RESOURCE_KEY);
         HashMap<String,String> map = new HashMap<>();
-        map.put("audience", rawAudience);
+        map.put(RESOURCE_KEY, rawAudience);
 
 
 

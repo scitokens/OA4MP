@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -28,22 +29,13 @@ public class STAuthorizedServletUtil extends OA2AuthorizedServletUtil {
     public STAuthorizedServletUtil(MyProxyDelegationServlet servlet) {
         super(servlet);
     }
-/*    protected void handleClaims(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, OA2ServiceTransaction transaction) throws Throwable {
-        STTransaction stTransaction = (STTransaction)transaction;
-        HTTPHeaderClaimsSource claimsSource = new HTTPHeaderClaimsSource();
-        UserInfo userInfo = new UserInfo();
-        userInfo.setMap(new JSONObject());
-        claimsSource.process(userInfo, httpServletRequest, transaction);
-        stTransaction.setClaims((JSONObject) userInfo.getMap());
-        servlet.getTransactionStore().save(stTransaction);
-    }*/
 
     @Override
     public void postprocess(TransactionState state) throws Throwable {
         super.postprocess(state);
         STTransaction stTransaction = (STTransaction) state.getTransaction();
         // Audience
-        String rawAudience = state.getRequest().getParameter(TokenExchangeConstants.AUDIENCE);
+        String rawAudience = state.getRequest().getParameter(TokenExchangeConstants.RESOURCE);
         StringTokenizer stringTokenizer = new StringTokenizer(rawAudience, " ");
         LinkedList<String> audience = new LinkedList<>();
         while (stringTokenizer.hasMoreElements()) {
@@ -69,8 +61,8 @@ public class STAuthorizedServletUtil extends OA2AuthorizedServletUtil {
     protected ArrayList<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
         HTTPHeaderClaimsSource xx = null;
         STTransaction stTransaction = (STTransaction) st;
-        System.err.println(getClass().getSimpleName() + ": scopes before resolveScopes = " + st.getScopes());
-        System.err.println(getClass().getSimpleName() + ": STscopes before resolveScopes = " + ((STTransaction) st).getStScopes());
+        DebugUtil.dbg(this, "scopes before resolveScopes = " + st.getScopes());
+        DebugUtil.dbg(this, "STscopes before resolveScopes = " + ((STTransaction) st).getStScopes());
 
         String rawScopes = params.get(SCOPE);
         if (rawScopes == null || rawScopes.length() == 0) {

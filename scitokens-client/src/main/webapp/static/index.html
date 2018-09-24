@@ -37,6 +37,8 @@ This client has two sets of audiences:</p>
 <h3>A set for anyone who can log in</h3>
 
 <ul>
+    <li>{"read":"/public/**"}</li>
+    <li>{"write":"/public/**"}</li>
     <li>{"read":"/home/${username}/**"}</li>
     <li>{"write":"/home/${username}/**"}</li>
     <li>{"queue":"/home/${username}/queueit/**"}</li>
@@ -57,6 +59,26 @@ This client has two sets of audiences:</p>
 within the NCSA to use one of these templates. Failure to be in one will result in an error.
 </p>
 
+<h2>Some examples</h2>
+<p>Here are some simple examples. On that shoule always work if your login works is to set the scope to</p>
+<pre>
+    read:/public write:/public
+</pre>
+and the audience to
+<pre>
+    https://demo.scitokens.org/xrootd
+</pre>
+
+<p>If your login name is thor for NCSA, you can have scopes like</p>
+<pre>
+    read:/home/thor write:/home/thor/lsst/data.hdf
+</pre>
+and the audience is
+<pre>
+    https://demo.ncsa.illinois.edu
+</pre>
+<p>Note that this gives general read access to your home directory but restricts the write to a specific file. The
+template allows for subdirectories and files.</p>
 
 </body>
 </html>

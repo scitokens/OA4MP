@@ -57,7 +57,8 @@ public class STSE extends OA2SE {
                 JSONWebKeys jsonWebKeys,
                 String issuer,
                 boolean utilServletEnabled,
-                boolean isATasSTEnabled) {
+                boolean isATasSTEnabled,
+                boolean isOIDCEnabled) {
         super(logger,
                 tsp,
                 csp,
@@ -85,7 +86,8 @@ public class STSE extends OA2SE {
                 twoFactorSupportEnabled,
                 maxClientRefreshTokenLifetime,
                 jsonWebKeys, issuer,
-                utilServletEnabled);
+                utilServletEnabled,
+                isOIDCEnabled);
 
         this.isATasSTEnabled = isATasSTEnabled;
     }
@@ -100,8 +102,4 @@ public class STSE extends OA2SE {
         this.isATasSTEnabled = isATasSTEnabled;
     }
 
-    @Override
-    public boolean isOIDCEnabled() {
-        return false;
-    }
 }
