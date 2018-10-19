@@ -1,107 +1,71 @@
 {
-  "config": "Surge SciTokens client demo configuration",
-  "isSaved": true,
-  "claims":{
-    "sourceConfig":     [
-          {"default":       {
-            "name": "HTTP header source",
-            "id": "42",
-            "enabled": true,
-            "failOnError": false,
-            "notifyOnFail": false,
-            "omitClaimsList":["aud","iss","exp","iat","nonce"]
-          }},
-      {
-              "ldap": {
-                "preProcessing": [
-                  {
-                    "$if": ["$true"],
-                    "$then": [{"$set": ["foo",{"$drop": ["@ncsa.illinois.edu","${eppn}"]}]}]
-                  }
-                ],
-                "postProcessing": [
-                  {
-                    "$if": ["$true"],
-                    "$then": [
-                      {"$exclude": ["foo"]}
-                    ]
-                  }
-                ],
-                "id": "58a170bfe4a59c05",
-                "name": "58a170bfe4a59c05",
-                "address": "ldap.ncsa.illinois.edu",
-                "port": 636,
-                "enabled": true,
-                "authorizationType": "none",
-                "failOnError": false,
-                "notifyOnFail": false,
-                "searchAttributes": [
-                  {
-                    "name": "memberOf",
-                    "isGroup": true,
-                    "returnAsList": false,
-                    "returnName": "isMemberOf"
-                  }
-                ],
-                "searchBase": "ou=People,dc=ncsa,dc=illinois,dc=edu",
-                "searchName": "foo",
-                "contextName": "",
-                "ssl": {
-                  "keystore": {},
-                  "tlsVersion": "TLS",
-                  "useJavaTrustStore": true,
-                  "password": "changeit",
-                  "type": "jks"
-                }
-              }
-            }
-    ],
-    "sources": [    {
-         "alias": "headers",
-         "className": "edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource"
-       }],
-    "preProcessing":     [
-      {"$if": ["$true"],
-       "$then": [{"$set_claim_source":["headers","42"]}]
-      },
-      {
-        "$if": [{"$equals":[{"$get": ["idp"]},"https://idp.ncsa.illinois.edu/idp/shibboleth"]}],
-        "$then": [{"$set_claim_source":["LDAP","58a170bfe4a59c05"]}]
-      }
-    ],
-    "postProcessing":[
-      {"$if": [{"$equals":[{"$get": ["idp"]},"https://idp.ncsa.illinois.edu/idp/shibboleth"]}],
-       "$then": [{"$set":["sub",
-         {"$drop": ["@ncsa.illinois.edu",{"$get":["eppn"]}]}
-       ]}]
-      }
-
+"config": "Surge SciTokens client demo configuration",
+"isSaved": true,
+"claims":   {
+"sourceConfig":     [
+  {"default":       {
+    "name": "HTTP header source",
+    "id": "42",
+    "enabled": true,
+    "failOnError": false,
+    "notifyOnFail": false,
+    "omitClaimsList":         [
+      "aud",
+      "iss",
+      "exp",
+      "iat",
+      "nonce"
     ]
-  },
-  "scitokens":
-  {"templates":[
+  }}
+],
+"sources": [    {
+  "alias": "headers",
+  "className": "edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource"
+}],
+"preProcessing":
+{"script":[
+   "set_claim_source('headers','42');",
+   "# header claim sources are always in use. If the IDP is NCSA, set it for use later.",
+   "if[",
+    "    equals(get('idp'),'https://idp.ncsa.illinois.edu/idp/shibboleth')",
+    "  ]then[",
+    "    set('foo',drop('@ncsa.illinois.edu',get('eppn')));",
+    "    set('eppn','foo');",
+    "    set_claim_source('ncsa-default','foo')",
+    "];"
+    ]},
+"postProcessing":
+{"script":[
+  "if[",
+   "    equals(get('idp'),'https://idp.ncsa.illinois.edu/idp/shibboleth')",
+   "  ]then[",
+  "     exclude('foo');",
+  "   ]"
+]}
+
+},
+"scitokens": {"templates":   [
     {
-      "aud": "https://demo.scitokens.org/xrootd",
-      "paths":
-      [
-            {"operation": "read","path": "/public/**"},
-            {"operation": "write","path": "/public/**"},
-            {"operation": "read","path": "/home/${user}/**"},
-            {"operation": "write","path": "/home/${user}/**"},
-            {"operation": "queue","path": "/home/${user}/queueit/**"},
-            {"operation": "execute","path": "/home/${user}/runit/**"}
-      ]
-    },
-    {
-          "aud": "https://demo.ncsa.illinois.edu",
-          "paths":
-          [
-                {"operation": "read","path": "/home/${user}/**"},
-                {"operation": "write","path": "/home/${user}/**"},
-                {"operation": "read","path": "/home/${group}/dataset/**"},
-                {"operation": "write","path": "/home/${group}/${user}/results/**"}
-          ]
-    }
+  "aud": "https://demo.scitokens.org/xrootd",
+  "paths":       [
+    {"operation": "read","path": "/public/**"},
+    {"operation": "write","path": "/public/**"},
+    {"operation": "read","path": "/home/${user}/**"},
+    {"operation": "write","path": "/home/${user}/**"},
+    {"operation": "queue","path": "/home/${user}/queueit/**"},
+    {"operation": "execute","path": "/home/${user}/runit/**"}
   ]
-  }
+},
+    {
+  "aud": "https://demo.ncsa.illinois.edu",
+  "paths":       [
+    {"operation": "read","path": "/public/**"},
+    {"operation": "write","path": "/public/**"},
+    {"operation": "read","path": "/home/${user}/**"},
+    {"operation": "write","path": "/home/${user}/**"},
+    {"operation": "read","path": "/home/${group}/dataset/**"},
+    {"operation": "write","path": "/home/${group}/${user}/results/**"}
+  ]
+}
+]}
 }

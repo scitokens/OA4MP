@@ -1,0 +1,40 @@
+{
+"config": "Surge SciTokens client configuration for the HT Condor credmon",
+"isSaved": true,
+"claims":   {
+"sourceConfig":     [
+  {"default":       {
+    "name": "HTTP header source",
+    "id": "42",
+    "enabled": true,
+    "failOnError": false,
+    "notifyOnFail": false,
+    "omitClaimsList":         [
+      "aud",
+      "iss",
+      "exp",
+      "iat",
+      "nonce"
+    ]
+  }}
+],
+"sources": [    {
+  "alias": "headers",
+  "className": "edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource"
+}],
+"preProcessing":
+{"script":[
+   "set_claim_source('headers','42');"
+    ]}
+},
+"scitokens": {"templates":   [
+    {
+      "aud": "https://c077.chtc.wisc.edu:8443/",
+    "paths":
+    [
+      {"operation": "read","path": "/public/**"},
+      {"operation": "write","path": "/public/**"}
+      ]
+  }
+]}
+}

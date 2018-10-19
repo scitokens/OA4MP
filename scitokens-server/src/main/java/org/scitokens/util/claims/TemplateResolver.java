@@ -26,7 +26,7 @@ public class TemplateResolver {
     /**
      * @param authorizationTemplates
      * @param audience               The requested audience
-     * @param scopes                  The requested scope in claims format.
+     * @param scopes                 The requested scope in claims format.
      * @return
      */
     public List<String> resolve(AuthorizationTemplates authorizationTemplates,
@@ -72,7 +72,6 @@ public class TemplateResolver {
     Groups group = null;
 
 
-
     public static final String ST_GROUP_NAME = "group";
     public static final String ST_USER_NAME = "user";
 
@@ -84,25 +83,32 @@ public class TemplateResolver {
         return username != null;
     }
 
-
+    /**
+     * The template is stored in the configuration. The target is the actual scope passed in by the client in the
+     * request.
+     * @param template
+     * @param target
+     * @return
+     */
     public boolean check(String template, String target) {
         DebugUtil.dbg(this, "testing " + target + " against template " + template);
         ArrayList<String> tests = new ArrayList<>();
         boolean un = template.contains("${" + ST_USER_NAME + "}");
         if (template.contains("${" + ST_GROUP_NAME + "}")) {
             // do replacements
-            if (!hasGroups()) {
-                throw new IllegalStateException("Error: group requested, but no groups for this user were found");
-            }
-            for (String key : group.keySet()) {
-                HashMap<String, String> group = new HashMap<>();
-                group.put(ST_GROUP_NAME, key);
-                if (hasUsername() && un) {
-                    group.put(ST_USER_NAME, username);
+            // There may be templates configured, but no groups for the user, depending on the IDP.
+            // In the case, skip all of this
+            if (hasGroups()) {
+                for (String key : group.keySet()) {
+                    HashMap<String, String> group = new HashMap<>();
+                    group.put(ST_GROUP_NAME, key);
+                    if (hasUsername() && un) {
+                        group.put(ST_USER_NAME, username);
+                    }
+                    String replacedString = TemplateUtil.replaceAll(template, group);
+                    DebugUtil.dbg(this, template + " --> " + replacedString);
+                    tests.add(replacedString);
                 }
-                String replacedString = TemplateUtil.replaceAll(template, group);
-                DebugUtil.dbg(this, template + " --> " + replacedString);
-                tests.add(replacedString);
             }
 
 
@@ -141,7 +147,7 @@ public class TemplateResolver {
                 }
             }
         }
-        System.err.println("   testing: returning NULL");
+        System.err.println("   testing: returning false");
 
         return false;
     }

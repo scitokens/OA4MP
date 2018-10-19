@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
+import org.scitokens.util.TokenExchangeConstants;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ import java.util.*;
 public class STStartRequest extends ClientServlet {
     public static final String SCOPE_CAPUT = "demo:";
     // as per https://tools.ietf.org/html/draft-ietf-oauth-resource-indicators-00
-    public static final String RESOURCE_KEY = "resource:";
+    //public static final String RESOURCE_KEY = "resource:";
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
@@ -55,9 +56,9 @@ public class STStartRequest extends ClientServlet {
         }
         System.err.println(getClass().getSimpleName() + ": setting scopes to " + newScopes);
         oa2ce.setScopes(newScopes);
-        String rawAudience = request.getParameter(RESOURCE_KEY);
+        String rawAudience = request.getParameter(TokenExchangeConstants.RESOURCE);
         HashMap<String,String> map = new HashMap<>();
-        map.put(RESOURCE_KEY, rawAudience);
+        map.put(TokenExchangeConstants.RESOURCE, rawAudience);
 
 
 

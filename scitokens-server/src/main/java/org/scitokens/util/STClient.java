@@ -29,6 +29,14 @@ public class STClient extends OA2Client {
         return authorizationTemplates;
     }
 
+    /**
+     * The name of the claim to use as the username in the {@link org.scitokens.util.claims.TemplateResolver}.
+     * note that this may be null if it is not set. In that case, use the default claim of sub.
+     * @return
+     */
+    public String getUsernameClaimKey(){
+        return STClientConfigurationUtil.getUsernameClaimKey(getConfig());
+    }
     protected AuthorizationTemplates authorizationTemplates;
 
 }

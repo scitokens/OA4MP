@@ -9,7 +9,9 @@ import edu.uiuc.ncsa.security.delegation.servlet.TransactionState;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.http.HttpStatus;
+import org.scitokens.loader.STSE;
 import org.scitokens.util.STClient;
 import org.scitokens.util.STTransaction;
 import org.scitokens.util.TokenExchangeConstants;
@@ -36,6 +38,12 @@ public class STAuthorizedServletUtil extends OA2AuthorizedServletUtil {
         STTransaction stTransaction = (STTransaction) state.getTransaction();
         // Audience
         String rawAudience = state.getRequest().getParameter(TokenExchangeConstants.RESOURCE);
+        ServletDebugUtil.dbg(this, "expected audience key" + TokenExchangeConstants.RESOURCE);
+        ServletDebugUtil.dbg(this, "raw audience = " + rawAudience);
+        if(rawAudience == null || rawAudience.isEmpty()){
+            rawAudience = ""; // this throws it in to the case of no requested audience. If this is missing and there is
+                              // a single registered template, just implicity accept they are the same and continue.
+        }
         StringTokenizer stringTokenizer = new StringTokenizer(rawAudience, " ");
         LinkedList<String> audience = new LinkedList<>();
         while (stringTokenizer.hasMoreElements()) {
@@ -59,6 +67,8 @@ public class STAuthorizedServletUtil extends OA2AuthorizedServletUtil {
 
     @Override
     protected ArrayList<String> resolveScopes(OA2ServiceTransaction st, Map<String, String> params, String state, String givenRedirect) {
+        STSE stse = (STSE)servlet.getServiceEnvironment();
+        ServletDebugUtil.dbg(this, "oidc enabled? " + stse.isOIDCEnabled());
         HTTPHeaderClaimsSource xx = null;
         STTransaction stTransaction = (STTransaction) st;
         DebugUtil.dbg(this, "scopes before resolveScopes = " + st.getScopes());

@@ -317,7 +317,7 @@ public class STATServlet extends OA2ATServlet implements TokenExchangeConstants 
             if (groups == null) {
                 throw new NFWException("Unrecognized group structure for class \"" + rawGroups.getClass().getSimpleName() + " = \"" + rawGroups + "\"");
             }
-        }else{
+        } else {
             groups = new Groups(); // so no null pointer exception.
         }
         if (!isEmpty(stse.getIssuer())) {
@@ -331,9 +331,16 @@ public class STATServlet extends OA2ATServlet implements TokenExchangeConstants 
         sciTokens.put(ISSUED_AT, Long.valueOf(System.currentTimeMillis() / 1000L));
         sciTokens.put(NOT_VALID_BEFORE, Long.valueOf((System.currentTimeMillis() - 5000L) / 1000L)); // not before is 5 minutes before current
 
+        String usernameClaimkey = SUBJECT;
+        ServletDebugUtil.dbg(this, "getting username claim key");
+        if (stClient.getUsernameClaimKey() != null) {
+            usernameClaimkey = stClient.getUsernameClaimKey();
+        }
+        ServletDebugUtil.dbg(this, "Got username claim key=" + usernameClaimkey);
+
 
         // Now to resolve audience and scope requests.
-        TemplateResolver templateResolver = new TemplateResolver(claims.getString(SUBJECT), groups);
+        TemplateResolver templateResolver = new TemplateResolver(claims.getString(usernameClaimkey), groups);
         LinkedList<String> requestedPermissions = new LinkedList<>();
         StringTokenizer st = new StringTokenizer(stTransaction.getStScopes(), " ");
         while (st.hasMoreElements()) {

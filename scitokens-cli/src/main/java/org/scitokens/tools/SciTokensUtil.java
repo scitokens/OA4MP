@@ -7,9 +7,13 @@ import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.Commands;
 import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.functor.parser.event.ParserUtil;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.List;
 import java.util.Vector;
 
 import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
@@ -206,7 +210,7 @@ public class SciTokensUtil extends ConfigurableCommandsImpl {
     }
 
 
-    protected void processBatchFile(String fileName, CLIDriver cli) throws Exception {
+    protected void processBatchFile(String fileName, CLIDriver cli) throws Throwable {
         if(fileName == null || fileName.isEmpty()){
             throw new FileNotFoundException("Error: The file name is missing.");
         }
@@ -221,16 +225,42 @@ public class SciTokensUtil extends ConfigurableCommandsImpl {
             throw new GeneralException("Error: Cannot read file \"" + fileName + "\". Please check your permissions.");
         }
         FileReader fis = new FileReader(file);
-        BufferedReader br = new BufferedReader(fis);
+        List<String> commands = ParserUtil.processInput(fis);
         SciTokensUtilCommands sciTokensCommands = getSciTokensCommands(cli);
         if (sciTokensCommands == null) {
             throw new NFWException("Error: No SciTokensUtilCommands configured, hence no logging.");
         }
         sciTokensCommands.setBatchMode(true);
-        int lineNumber = 1;
+
+        for(String command : commands){
+            try {
+                       int rc = cli.execute(command);
+                       switch (rc) {
+                           // Hint: The colons in the messages line up (more or less) so that the log file is very easily readable at a glance.
+                           case CLIDriver.ABNORMAL_RC:
+                                   sciTokensCommands.error("Error: \"" +  command + "\"");
+                               break;
+                           case CLIDriver.HELP_RC:
+                                   sciTokensCommands.info("  Help: invoked.");
+                               break;
+                           case CLIDriver.OK_RC:
+                           default:
+                               if(sciTokensCommands.isVerbose()){
+                                   sciTokensCommands.info("    ok: \"" + command+ "\"");
+                               }
+                       }
+
+                   } catch (Throwable t) {
+                       sciTokensCommands.error(t, "Error executing batch file command \"" + command + "\"");
+                   }
+
+        }
+//        BufferedReader br = new BufferedReader(fis);
+  /*      int lineNumber = 1;
         String lineIn = br.readLine();  // actual lines in the file, comments and all
         boolean isExecuteLine = false;
-
+*/
+/*
         String executableLine = "";
         while (lineIn != null) {
             // strip comment
@@ -282,6 +312,7 @@ public class SciTokensUtil extends ConfigurableCommandsImpl {
             lineNumber++;
         }
         br.close();
+*/
 
 
     }

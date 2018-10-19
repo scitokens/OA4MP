@@ -37,7 +37,7 @@ public class SciTokensUtilCommands extends CommonCommands {
     /**
      * If a line contains this character, then the line is truncated at that point before processing.
      */
-    public static String BATCH_FILE_COMMENT_CHAR = "//";
+    //public static String BATCH_FILE_COMMENT_CHAR = "//";
     /**
      * If a line ends with this (after the comment is removed), then glow it on to the
      * next input line. In effect this lets you split commands across multiple lines, e.g.

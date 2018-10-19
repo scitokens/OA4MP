@@ -71,6 +71,24 @@ public class TemplateResolverTest {
         assert templateResolver.check(PATH_1_WRITE, WRITE_1_TEST);
     }
 
+    /**
+     * For the case that the user is not in any groups. None of the group templates should be
+     * resolved against.
+     * @throws Exception
+     */
+
+    @Test
+       public void testNoGroups() throws Exception {
+           TemplateResolver templateResolver = new TemplateResolver("bob", new Groups());
+           AuthorizationTemplates at = getTemplates();
+           AuthorizationTemplate template = at.get(AUDIENCE_1);
+           assert templateResolver.check(template.getAudience(), AUDIENCE_1);
+
+           // Most basic test to show this works.
+           assert templateResolver.check(PATH_1_READ, READ_1_TEST);
+           assert templateResolver.check(PATH_1_WRITE, WRITE_1_TEST);
+       }
+
     @Test
     public void testUserAndGroup() throws Exception {
         TemplateResolver templateResolver = new TemplateResolver("bob", getTestGroups());

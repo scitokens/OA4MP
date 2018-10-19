@@ -12,6 +12,13 @@ import org.scitokens.util.claims.AuthorizationTemplates;
 public class STClientConfigurationUtil extends ClientConfigurationUtil {
     public static String SCI_TOKENS_KEY = "scitokens";
     public static String AUTHORIZATION_TEMPLATES_KEY = "templates";
+    /**
+     * If this is present in the configuration, then the value of this claim is used
+     * as the username for resolving against templates. The default is the sub claim
+     * but any claim may be used. Note that if you specify an non-existent claim, an
+     * exception will be raised, so be sure you have actually set the claim before resolution.
+     */
+    public static String USERNAME_CLAIM_KEY = "usernameClaimKey";
 
     /**
      * Return a component in the SciTokens configuration.
@@ -40,5 +47,15 @@ public class STClientConfigurationUtil extends ClientConfigurationUtil {
     public static void setAuthorizationTemplates(JSONObject config, AuthorizationTemplates authorizationTemplates) {
         setThingy(SCI_TOKENS_KEY, config, AUTHORIZATION_TEMPLATES_KEY, authorizationTemplates.toJSON());
 
+    }
+
+    public static String getUsernameClaimKey(JSONObject config) {
+        JSONArray stConfig = getSTThingy(config, USERNAME_CLAIM_KEY);
+        // Since the last call always wraps whatever in a JSONArray, this should have a single
+        // element that is the value we want
+        if (!stConfig.isEmpty()) {
+            return stConfig.getString(0);
+        }
+        return null;
     }
 }
