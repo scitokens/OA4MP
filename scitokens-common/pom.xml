@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.scitokens</groupId>
         <artifactId>scitokens-java</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
     </parent>
 
     <properties>
@@ -19,20 +19,6 @@
     <name>Common code for SciTokens</name>
     <packaging>jar</packaging>
     <dependencies>
-        <!--  <dependency>
-              <groupId>edu.uiuc.ncsa.myproxy</groupId>
-              <artifactId>oa4mp-server-oauth2</artifactId>
-              <version>4.1.1</version>
-              <type>war</type>
-              <scope>runtime</scope>
-          </dependency>-->
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-server-oauth2</artifactId>
-            <version>4.1.1</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-api</artifactId>
@@ -58,28 +44,6 @@
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
             <version>4.1.1</version>
         </dependency>
- <!--       <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-core</artifactId>
-            <version>4.1.1</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>-->
- <!--       <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-delegation-common</artifactId>
-            <version>4.1.1</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>-->
-
- <!--       <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>oa4mp-server-test</artifactId>
-            <version>4.1.1</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-2.0</artifactId>
@@ -181,39 +145,25 @@
                     </items>
                 </configuration>
             </plugin>
-            <!--    <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-war-plugin</artifactId>
-                    <version>3.1.0</version>
-                    <executions>
-                        <execution>
-                            <inherited>true</inherited>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>war</goal>
-                            </goals>
-                        </execution>
-                    </executions>
+            <plugin>
+                           <groupId>org.apache.maven.plugins</groupId>
+                           <artifactId>maven-javadoc-plugin</artifactId>
+                           <version>2.9.1</version>
+                           <executions>
+                               <execution>
+                                   <id>attach-javadocs</id>
+                                   <goals>
+                                       <goal>jar</goal>
+                                   </goals>
+                                   <configuration>
+                                       <!-- Java 8 specific or empty javadoc tags make the build fail -->
+                                       <additionalparam>-Xdoclint:none</additionalparam>
+                                   </configuration>
 
-                    <configuration>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                        <archive>
-                            <manifest>
-                                <addClasspath>true</addClasspath>
-                            </manifest>
-                            <manifestEntries>
-                                <application-version>${pom.version}</application-version>
-                                <application-name>${pom.name}</application-name>
-                                <build-time>${timestamp}</build-time>
-                                <implementation-version>${project.version}</implementation-version>
-                                <implementation-build>${buildNumber}</implementation-build>
-                            </manifestEntries>
-                        </archive>
+                               </execution>
+                           </executions>
 
-                    </configuration>
-                </plugin>-->
+            </plugin>
         </plugins>
         <finalName>scitokens-common</finalName>
     </build>
