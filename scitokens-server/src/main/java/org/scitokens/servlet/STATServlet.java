@@ -38,6 +38,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
+import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.EXPIRATION;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.ISSUED_AT;
 import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.ISSUER;
@@ -332,14 +333,17 @@ public class STATServlet extends OA2ATServlet implements TokenExchangeConstants 
         sciTokens.put(NOT_VALID_BEFORE, Long.valueOf((System.currentTimeMillis() - 5000L) / 1000L)); // not before is 5 minutes before current
 
         String usernameClaimkey = SUBJECT;
-        ServletDebugUtil.dbg(this, "getting username claim key");
+        trace(this, "getting username claim key");
         if (stClient.getUsernameClaimKey() != null) {
             usernameClaimkey = stClient.getUsernameClaimKey();
         }
-        ServletDebugUtil.dbg(this, "Got username claim key=" + usernameClaimkey);
-
-
+        trace(this, "Got username claim key=" + usernameClaimkey);
         // Now to resolve audience and scope requests.
+        if(!claims.containsKey(usernameClaimkey)){
+            String message = "Error: there is no username associated with the claim \"" + usernameClaimkey + "\"";
+            ServletDebugUtil.warn(this, message);
+            throw new IllegalStateException(message);
+        }
         TemplateResolver templateResolver = new TemplateResolver(claims.getString(usernameClaimkey), groups);
         LinkedList<String> requestedPermissions = new LinkedList<>();
         StringTokenizer st = new StringTokenizer(stTransaction.getStScopes(), " ");

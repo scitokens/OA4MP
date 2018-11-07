@@ -12,3 +12,27 @@
 ## Docs
 
 https://scitokens.org/
+
+## Notes
+
+This is standard OA4MP with an extension to handle SciTokens. 
+You should set the OIDCEnabled flag to false 
+(see here: http://grid.ncsa.illinois.edu/myproxy/oauth/server/dtd/server-dtd-service-tag.xhtml) and there is one additional configuration flag specific to SciTokens that needs to be set true, , 
+issueATasSciToken = issue the Access Tokens as a SciToken. 
+A snippet of the configuration might look like this:
+```XML
+<service  name="my.scitokens.server"
+          issueATasSciToken="true"
+          OIDCEnabled="false"
+          refreshTokenLifetime="1000000"
+          refreshTokenEnabled="true"
+          scheme="sciTokens"
+          schemeSpecificPart=""
+          clientSecretLength="40"
+          debug="trace">
+  <!-- other stuff -->
+ </service>
+ ```
+
+ 
+There is a template document as well at https://docs.google.com/document/d/1R9d5RI_4RgDlsiOmTK7_XVhjRaoNIXW_DijGKQ-YtZk/edit#
