@@ -45,7 +45,8 @@ it is presented to the the token exchange endpoint to get a SciToken.) A snippet
  ```
 ### For clients
 
-Once you have a server up and running, you need to register and configure clients in order to get SciTokens.  
+Once you have a server up and running, you need to [register and configure clients](http://grid.ncsa.illinois.edu/myproxy/oauth/client/configuration/index.xhtml) 
+in order to get SciTokens.  
 There is a template document as well [here](https://docs.google.com/document/d/1R9d5RI_4RgDlsiOmTK7_XVhjRaoNIXW_DijGKQ-YtZk/edit#).
 Templates tell the server how the client should create it SciTokens. There is a lot of flexibility in what
 can be done since there is a strong [scripting language](https://docs.google.com/document/d/1BtlCbvGCcjblgtCNnaC09QLktXksxVD-P9dTvz1HAMQ/edit?usp=sharing) backing the configurations. Creation of SciTokens can be 
