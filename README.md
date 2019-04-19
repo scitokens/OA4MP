@@ -10,7 +10,8 @@
 * [Maven](https://maven.apache.org/) 3.0+
 * Tomcat 7 or above
 * Java mail (see [here](http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/server-email.xhtml)
-* Some form of persistent storage, such as Postgres, MySQL, MariaDB or a file system.
+* Some form of persistent storage, such as Postgres, MySQL, MariaDB or a file system. 
+  See the specific sections [here](http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/config-index.xhtml)
 
 ## Docs
 
