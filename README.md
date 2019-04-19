@@ -8,6 +8,9 @@
 
 * Java 8+
 * [Maven](https://maven.apache.org/) 3.0+
+* Tomcat 7 or above
+* Java mail (see [here](http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/server-email.xhtml)
+* Some form of persistent storage, such as Postgres, MySQL, MariaDB or a file system.
 
 ## Docs
 
@@ -15,11 +18,17 @@ https://scitokens.org/
 
 ## Notes
 
-This is standard OA4MP with an extension to handle SciTokens. 
-You should set the OIDCEnabled flag to false 
-(see here: http://grid.ncsa.illinois.edu/myproxy/oauth/server/dtd/server-dtd-service-tag.xhtml) and there is one additional configuration flag specific to SciTokens that needs to be set true, , 
+### For the server
+This is standard [OA4MP](http://grid.ncsa.illinois.edu/myproxy/oauth/server/index.xhtml) with an extension to handle SciTokens.
+So pretty much all of the standard OA4MP documentation and features work.  
+The default for OA4MP is OIDC, so you should set the OIDCEnabled flag to false unless you need OIDC support 
+(see [here](http://grid.ncsa.illinois.edu/myproxy/oauth/server/dtd/server-dtd-service-tag.xhtml)) 
+and there is one additional configuration flag specific to SciTokens that needs to be set true,
+```aidl
 issueATasSciToken = issue the Access Tokens as a SciToken. 
-A snippet of the configuration might look like this:
+```  
+Otherwise a non-SciToken will be generated as the access token. (That would be used in a very specific case, where
+it is presented to the the token exchange endpoint to get a SciToken.) A snippet of the configuration might look like this:
 ```XML
 <service  name="my.scitokens.server"
           issueATasSciToken="true"
@@ -33,6 +42,13 @@ A snippet of the configuration might look like this:
   <!-- other stuff -->
  </service>
  ```
+### For clients
 
- 
-There is a template document as well at https://docs.google.com/document/d/1R9d5RI_4RgDlsiOmTK7_XVhjRaoNIXW_DijGKQ-YtZk/edit#
+Once you have a server up and running, you need to register and configure clients in order to get SciTokens.  
+There is a template document as well [here](https://docs.google.com/document/d/1R9d5RI_4RgDlsiOmTK7_XVhjRaoNIXW_DijGKQ-YtZk/edit#).
+Templates tell the server how the client should create it SciTokens. There is a lot of flexibility in what
+can be done since there is a strong [scripting language](https://docs.google.com/document/d/1BtlCbvGCcjblgtCNnaC09QLktXksxVD-P9dTvz1HAMQ/edit?usp=sharing) backing the configurations. Creation of SciTokens can be 
+dictated as well based on the claims (which are best viewed as metadata) about the user.  
+
+You may also manipulate SciTokens (which includes many other useful utilities) using the [command line 
+utilities](https://docs.google.com/document/d/10ShyuYuouaRyE-hDMAhBYZCmSzlJtUkuY4bkqtDHmZw/edit?usp=sharing)
