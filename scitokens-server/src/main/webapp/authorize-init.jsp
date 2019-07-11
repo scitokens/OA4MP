@@ -51,6 +51,11 @@ please sign in with your username and password.
                             <i>Name:</i> ${clientName}
                             <br>
                             <i>URL:</i> ${clientHome}
+                            <br>
+                            <i>Requested Scopes:</i> ${clientScopes}
+                            <br>
+                            <i>Audience for scopes:</i> ${clientAudience}
+
                         </td>
                     </tr>
                 </table>
@@ -71,7 +76,7 @@ please sign in with your username and password.
                             <input type="password" size="25" name="${AuthPassword}"/>
                         </td>
                     </tr>
-                 <!-- Unhide this when you want to support it. All the machinery is in place.
+                    <!-- Unhide this when you want to support it. All the machinery is in place.
                      <tr>
                         <td>Refresh token lifetime</td>
                         <td><input type="text" size="25" name="${AuthRTL}"

@@ -1,0 +1,52 @@
+{
+"config": "Surge SciTokens client demo configuration",
+"isSaved": true,
+"claims":   {
+"sourceConfig":     [
+  {"default":       {
+    "name": "HTTP header source",
+    "id": "42",
+    "enabled": true,
+    "failOnError": false,
+    "notifyOnFail": false,
+    "omitClaimsList":         [
+      "aud",
+      "iss",
+      "exp",
+      "iat",
+      "nonce"
+    ]
+  }}
+],
+"sources": [    {
+  "alias": "headers",
+  "className": "edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource"
+}],
+  "preProcessing":
+  {"script":[
+     "set_claim_source('headers','42');",
+     "# header claim sources are always in use. If the IDP is NCSA, set it for use later.",
+     "if[",
+      "    equals(get('idp'),'https://idp.ncsa.illinois.edu/idp/shibboleth')",
+      "  ]then[",
+      "    set('foo',drop('@ncsa.illinois.edu',get('eppn')));",
+      "    set('eppn','foo');",
+      "    set_claim_source('ncsa-default','foo')",
+      "];"
+      ]},
+  "postProcessing":
+  {"script":[
+    "if[equals('${eppn}','dabrown@syr.edu')]then[set('username','dbrown')];"
+  ]}
+
+  },
+  "scitokens": {"templates":   [
+      {
+    "aud": "sugwg-scitokens.phy.syr.edu",
+    "paths":       [
+      {"operation": "read","path": "/user/dbrown"},
+      {"operation": "write","path": "/user/dbrown"}
+    ]
+  }
+  ]}
+  }

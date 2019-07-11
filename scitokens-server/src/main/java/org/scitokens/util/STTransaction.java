@@ -59,5 +59,21 @@ public class STTransaction extends OA2ServiceTransaction {
 
     List<String> audience;
 
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+     * KLUDGE. We are introducing versions to ScoTokens and need to start putting in the machinery. Initially
+     * all this does is allow us to write version 2 code and ignore it. This should be configurable somehow. The
+     * question then is if this is set per client or if it is part of the request per transaction. At the least, having it
+     * in the transaction is not wrong for the granularity...
+     */
+    String version = STClientConfigurationUtil.VERSION_1_0;
+
 
 }

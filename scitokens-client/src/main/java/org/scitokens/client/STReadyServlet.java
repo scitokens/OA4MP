@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2RedirectableError;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Scopes;
@@ -141,7 +142,7 @@ public class STReadyServlet extends ClientServlet {
                 request.setAttribute("st_accessToken", formattedToken);
                 request.setAttribute("st_header", header.toString(2));
                 request.setAttribute("st_verified", Boolean.toString(isVerified));
-                JSONWebKey webKey = jsonWebKeys.get(header.get(SciTokensUtil.KEY_ID));
+                JSONWebKey webKey = jsonWebKeys.get(header.get(JWTUtil.KEY_ID));
                 String keyPEM = KeyUtil.toX509PEM(webKey.publicKey);
                 request.setAttribute("st_public_key", keyPEM);
 

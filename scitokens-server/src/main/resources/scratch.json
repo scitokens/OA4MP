@@ -32,6 +32,8 @@
     "    set('foo',drop('@ncsa.illinois.edu',get('eppn')));",
     "    set('eppn','foo');",
     "    set_claim_source('ncsa-default','foo')",
+    "]else[",
+    "    set('sub','dbrown')",
     "];"
     ]},
 "postProcessing":

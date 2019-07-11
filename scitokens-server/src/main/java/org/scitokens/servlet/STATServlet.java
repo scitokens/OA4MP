@@ -328,7 +328,10 @@ public class STATServlet extends OA2ATServlet implements TokenExchangeConstants 
         }
         sciTokens.put(SUBJECT, claims.get(SUBJECT));
         sciTokens.put(EXPIRATION, Long.valueOf(System.currentTimeMillis() / 1000L + 900L));
-        sciTokens.put(ST_CLIENT_IDENTIFIER, parameters.get("client_id"));
+        DebugUtil.dbg(this, "SciTokens version = " + stTransaction.getVersion());
+        if(stTransaction.getVersion().equals(STClientConfigurationUtil.VERSION_2_0)) {
+            sciTokens.put(ST_CLIENT_IDENTIFIER, parameters.get("client_id"));
+        }
         sciTokens.put(ISSUED_AT, Long.valueOf(System.currentTimeMillis() / 1000L));
         sciTokens.put(NOT_VALID_BEFORE, Long.valueOf((System.currentTimeMillis() - 5000L) / 1000L)); // not before is 5 minutes before current
 

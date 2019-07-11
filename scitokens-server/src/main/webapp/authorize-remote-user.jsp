@@ -31,7 +31,7 @@
     }
 </style>
 <body>
-<h2>Welcome to the OAuth 2.0 for MyProxy Client Authorization Page</h2>
+<h2>Welcome to the OAuth 2.0 SciTokens Authorization Page</h2>
 The Client below is requesting access to your account. If you approve,
 please accept, otherwise, cancel.
 <p>
@@ -42,19 +42,23 @@ please accept, otherwise, cancel.
         <tr valign="top">
             <th>Client Information</th>
         </tr>
-        <tr>
+        <tr>                         cid
             <td> The client listed below is requesting the following claims.
               You may deny this by clicking cancel.
                 <br><br>
                 <i>Name:</i> ${clientName}
                 <br>
                 <i>URL:</i> ${clientHome}
+                <br>
+                    <i>Requested Scopes:</i> ${clientScopes}
+                    <br>
+                    <i>Audience for scopes:</i> ${clientAudience}
             </td>
         </tr>
         <tr>
             <td>
                 <input type="submit" style="float: left;" value="Accept"/>
-                <input type="button" style="float: right;" name="cancel" value="Cancel"/></a>
+                <input type="button" style="float: right;" name="cancel" value="Cancel"/>
             </td>
         </tr>
         <tr>

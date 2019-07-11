@@ -255,65 +255,6 @@ public class SciTokensUtil extends ConfigurableCommandsImpl {
                    }
 
         }
-//        BufferedReader br = new BufferedReader(fis);
-  /*      int lineNumber = 1;
-        String lineIn = br.readLine();  // actual lines in the file, comments and all
-        boolean isExecuteLine = false;
-*/
-/*
-        String executableLine = "";
-        while (lineIn != null) {
-            // strip comment
-            String fullLine = null;
-            if (-1 < lineIn.indexOf(SciTokensUtilCommands.BATCH_FILE_COMMENT_CHAR)) {
-                fullLine = lineIn.substring(0, lineIn.indexOf(SciTokensUtilCommands.BATCH_FILE_COMMENT_CHAR)).trim();
-            } else {
-                // no comment
-                fullLine = lineIn.trim();
-            }
-            if (fullLine.endsWith(SciTokensUtilCommands.BATCH_FILE_LINE_CONTINUES)) {
-                fullLine = fullLine.substring(0, fullLine.lastIndexOf(SciTokensUtilCommands.BATCH_FILE_LINE_CONTINUES));
-                isExecuteLine = false;
-            } else {
-                isExecuteLine = true;
-            }
-            executableLine = executableLine + " " + fullLine;
-
-            executableLine = executableLine.trim();
-            if (isExecuteLine) {
-                if (!executableLine.isEmpty()) {
-                    try {
-                        int rc = cli.execute(executableLine);
-                        switch (rc) {
-                            // Hint: The colons in the messages line up (more or less) so that the log file is very easily readable at a glance.
-                            case CLIDriver.ABNORMAL_RC:
-                                    sciTokensCommands.error("Error: line # " + lineNumber + ",  \"" + executableLine + "\"");
-                                break;
-                            case CLIDriver.HELP_RC:
-                                    sciTokensCommands.info("  Help: invoked at line #" + lineIn);
-                                break;
-                            case CLIDriver.OK_RC:
-                            default:
-                                if(sciTokensCommands.isVerbose()){
-                                    sciTokensCommands.info("    ok: \"" + executableLine + "\"");
-                                }
-                        }
-
-                    } catch (Throwable t) {
-                        sciTokensCommands.error(t, "Error executing batch file in line #" + lineIn);
-                    }
-                }
-                // reset state even if nothing executes at this point.
-                executableLine = "";
-                isExecuteLine = false;
-            }
-
-            lineIn = br.readLine();
-            lineNumber++;
-        }
-        br.close();
-*/
-
 
     }
 
