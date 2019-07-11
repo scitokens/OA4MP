@@ -1,0 +1,14 @@
+Installing a SciTokens server.
+
+First off read the readme on the site for the requirements:
+
+https://github.com/scitokens/scitokens-java/blob/master/README.md
+
+Then you can get the current release candidate at
+
+https://github.com/scitokens/scitokens-java/releases/tag/v.1.2a
+
+This contains the server, a client (both a web app and a command line client) as well as the utilities for creating and
+managing keys. There are also a couple of schell scripts to run a few things.
+
+The most  

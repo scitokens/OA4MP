@@ -76,7 +76,8 @@ public class STLoader<T extends STSE> extends OA2ConfigurationLoader<T> {
                     getIssuer(),
                     isUtilServerEnabled(),
                     issueSciTokenForAT(),
-                    isOIDCEnabled());
+                    isOIDCEnabled(),
+                    getMultiJSONStoreProvider());
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
                 ((BasicClaimsSourceImpl) getClaimSource()).setOa2SE(se);
             }

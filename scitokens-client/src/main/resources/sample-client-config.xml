@@ -1,0 +1,61 @@
+<config>
+    <!--
+       A sample client configuration. Note that since this is OAuth 2, this mostly is a configuration for that
+       The configuration for SciTokens that allows for scopes and such lives on the server and must be done
+       by the server administrators.
+    -->
+    <!--
+        You should set the name to something you want human readable, note that this must be set in the
+        web.xml as well
+    -->
+    <client name="oa4mp:scitokens.fileStore">
+        <logging
+              logFileName="/var/log/tomcat/scitokens-client.xml"
+              logName="oa2-client"
+              logSize="100000"
+              logFileCount="2"
+              debug="true"/>
+        <!--
+          The identifier that is given to you and the corresponding secret go here.
+        -->
+         <id>CLIENT_IDENTIFIER</id>
+        <secret>CLIENT_SECRET</secret>
+         <!--
+            These scopes (a vastly overused word in the OAuth universe) determine what goes in the id_token and,
+            in the case of OA4MP, whether the users are allowed to get certificates. In this case, these are disabled.
+         -->
+         <scopes>
+             <scope enabled="false">email</scope>
+             <scope enabled="false">profile</scope>
+             <scope enabled="false">edu.uiuc.ncsa.myproxy.getcert</scope>
+         </scopes>
+        <!--
+             The next set of URIs point to the desired service endpoints and the well-known file.
+        -->
+         <serviceUri>https://address.of.the.server/scitokens-server</serviceUri>
+         <authorizeUri>https://address.of.the.server/scitokens-server/authorize</authorizeUri>
+        <wellKnownUri>https://address.of.the.server/scitokens-server/.well-known</wellKnownUri>
+
+        <!--
+            The callback you used when registering this client. Note that this MUST match exactly down
+            to case or the OAuth spec. requires that the request be rejected.
+        -->
+         <callbackUri>https://address.of.this.client/scitokens-client/ready</callbackUri>
+        <!--
+        This is the lifetime in seconds for refresh tokens.
+        -->
+         <lifetime>8640</lifetime>
+        <!--
+           The next flag tells whether the server is OIDC or not.
+        -->
+         <OIDCEnabled>false</OIDCEnabled>
+        <!--
+            This is the path to storage for this client. Be sure that the permissions are set correctly, so the owner
+            of this directory is root and the group is tomcat. As long as the request is valid, there will be an entry
+            in this store with its state. Once the request has ended, it will be removed.
+        -->
+         <fileStore path="/path/to/storage">
+            <assetStore/>
+         </fileStore>
+    </client>
+</config>

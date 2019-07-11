@@ -2,6 +2,7 @@ package org.scitokens.util.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
+import edu.uiuc.ncsa.security.util.functor.JMetaMetaFunctor;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.scitokens.util.STClaimsProcessor;
@@ -24,7 +25,7 @@ public class STFunctorFactory extends OA2FunctorFactory {
     STClaimsProcessor handler;
 
     @Override
-    protected JFunctor figureOutFunctor(JSONObject rawJson) {
+    protected JMetaMetaFunctor figureOutFunctor(JSONObject rawJson) {
         JFunctor ff = null;
         if (hasEnum(rawJson, STFunctorClaimTypes.ACCESS)) {
             jAccess j = new jAccess(claims);

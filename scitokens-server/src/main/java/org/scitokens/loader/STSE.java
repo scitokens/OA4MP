@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
+import edu.uiuc.ncsa.security.util.json.JSONStore;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 
@@ -58,7 +59,8 @@ public class STSE extends OA2SE {
                 String issuer,
                 boolean utilServletEnabled,
                 boolean isATasSTEnabled,
-                boolean isOIDCEnabled) {
+                boolean isOIDCEnabled,
+                Provider<JSONStore> jsonStoreProvider) {
         super(logger,
                 tsp,
                 csp,
@@ -87,7 +89,8 @@ public class STSE extends OA2SE {
                 maxClientRefreshTokenLifetime,
                 jsonWebKeys, issuer,
                 utilServletEnabled,
-                isOIDCEnabled);
+                isOIDCEnabled,
+                jsonStoreProvider);
 
         this.isATasSTEnabled = isATasSTEnabled;
     }
