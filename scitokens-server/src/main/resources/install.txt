@@ -4,11 +4,20 @@ First off read the readme on the site for the requirements:
 
 https://github.com/scitokens/scitokens-java/blob/master/README.md
 
-Then you can get the current release candidate at
+Then you can get the current release candidate (version 1.2a) at
 
 https://github.com/scitokens/scitokens-java/releases/tag/v.1.2a
 
 This contains the server, a client (both a web app and a command line client) as well as the utilities for creating and
 managing keys. There are also a couple of schell scripts to run a few things.
 
-The most  
+
+Generating keys
+After you get the release candidate, you need to invoke the scitokens-util command line utility to create keys (if you
+do not have them from another source). This is easy, you can do it in batch mode as
+
+java -jar scitokens-util.jar -batch create_keys /path/to/file.jwk
+
+This will create a basic set of JSON web keys. This path go into your server configuration file.
+
+Make sure that

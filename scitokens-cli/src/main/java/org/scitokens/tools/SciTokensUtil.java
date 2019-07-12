@@ -140,7 +140,6 @@ public class SciTokensUtil extends ConfigurableCommandsImpl {
         }
 
         SciTokensUtil sciTokensCLI = new SciTokensUtil(myLoggingFacade);
-        sciTokensCLI.useHelp();
         SciTokensUtilCommands sciTokensCommands = new SciTokensUtilCommands(myLoggingFacade);
         sciTokensCommands.setVerbose(isVerbose);
         sciTokensCommands.setPrintOuput(!isNoOuput);
@@ -159,6 +158,7 @@ public class SciTokensUtil extends ConfigurableCommandsImpl {
             }
             if (argLine.hasArg(BATCH_MODE_FLAG)) {
                 sciTokensCLI.processBatchModeCommand(cli, args);
+                return; //this should end once a single command is processed.
             }
             // alternately, parse the arguments
             String cmdLine = args[0];
@@ -201,7 +201,7 @@ public class SciTokensUtil extends ConfigurableCommandsImpl {
         // so we need to drop the name of the function and the -batch flag.
         String cmdLine = "";
         for (String arg : args) {
-            if (!arg.equals(DUMMY_FUNCTION) && !arg.equals(SciTokensUtilCommands.BATCH_FILE_MODE_FLAG)) {
+            if (!arg.equals(DUMMY_FUNCTION) && !arg.equals(SciTokensUtilCommands.BATCH_MODE_FLAG)) {
 
                 cmdLine = cmdLine + " " + arg;
             }

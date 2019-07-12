@@ -50,6 +50,7 @@
         </tr>
 
     </table>
+   <H2>Enter your SciTokens audiences and scope request templates. </H2>
 
     <table>
         <tr>
@@ -99,6 +100,21 @@
     <input type="hidden" id="status" name="${action}"
            value="${request}"/>
 </form>
-
+<h3>A little explanation about audiences and templates.</h3>
+<p>These refer to SciToken specific scopes. Audiences are associated with sets of scope
+    templates. The templates allow you to specify what access you permit. Templates may
+    end in <code>**</code> wildcards indicating any sub-path will be accepted.
+    You should enter only a single template per line. A typical template would like like</p>
+<pre>read:/public/**</pre>
+<p>To give read access to everything in the /public directory and below it.
+    You may also use variables such as</p>
+<ul>
+    <li>${user} = the user's name at logon. This is taken from the claim given above.</li>
+    <li>${group} = IF there is group information associated with this user (e.g. in LDAP) then you may
+    access the name of the group here. </li>
+</ul>
+<p>For instance if a user is in the groups <code>admin,users,gravity</code> then a permission template might look
+like <code>read:/home/${user}/${group}/**</code> and if user bob could make the following specific request
+against this template: <code>read:/home/bob/gravity/data/raw.hdf</code></p>
 </body>
 </html>
