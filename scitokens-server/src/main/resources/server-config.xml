@@ -2,18 +2,23 @@
     <!--
     This is a sample configuration for a SciTokens server. It contains all that is necessary to boot it up and
     get it running. It does NOT have any configurations for clients which must be added on a per client basis.
-    Much of what is here is place holders. 
+    Much of what is here is place holders.
+
+    This is derived from the much more imposing configuration file format used by OA4MP. The comments here are more than enough
+    to get you up and running, but if you want the definitive reference, look here:
+
+    http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/config-index.xhtml
     -->
     <!--
        The service tag contains a lot of information about the system, most of which should not need to be changed
        You should, however set
        name = some human readable name for this configuration. Note that this must be used in the web.xml as well.
+              How to set it in the web.xml is here:
+              http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/server-configuration-file.xhtml
        issueATasSciToken = set this true if you want the Access Tokens to be SciTokens
        issuer = this is the issuer in the id_token and has nothing to do with SciTokens. Set it to this server's address
        address = the address of this server. You should set this especially in load-balancing cases where Tomcat's
                  idea of what the server is should not be used.
-       debug = Lets you set the level of information you want. "warn" means only warnings, "info" means informational
-               messages, "trace" dumps out all manner of low level information. "off" turns everything off.
     -->
     <service name="oa4mp:scitokens.fileStore"
               version="1.0"
@@ -25,9 +30,11 @@
               schemeSpecificPart=""
               clientSecretLength="40"
               OIDCEnabled="false"
-              debug="trace"
               issuer="https://address.of.your.server/scitokens-server"
               address="https://address.of.your.server/scitokens-server">
+        <!--
+            Logging requires a path to the log file and that is it.
+        -->
                <logging
                  logFileName="/path/to/log/file"
                  logName="scitokens"

@@ -15,6 +15,11 @@ public class AuthorizationPath {
         fromJSON(json);
     }
 
+    public AuthorizationPath(String template) {
+        super();
+        fromString(template);
+
+    }
     public AuthorizationPath(String operation, String path) {
         this.operation = operation;
         this.path = path;
@@ -32,6 +37,25 @@ public class AuthorizationPath {
         path = j.getString("path");
     }
 
+    /**
+     * This allows populating this from a single string of the form operation:path
+     *
+     * @param template
+     */
+    public void fromString(String template) {
+        int colonIndex = template.indexOf(":");
+        if (colonIndex < 0) {
+            throw new IllegalArgumentException("Error: template \"" + template + "\" cannot be parsed.");
+        }
+        operation = template.substring(0, colonIndex);
+        path = template.substring(colonIndex + 1);
+    }
+
+    @Override
+    public String toString() {
+        return operation + ":" + path;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof AuthorizationPath)) return false;
@@ -39,5 +63,10 @@ public class AuthorizationPath {
         if (!BeanUtils.checkEquals(ap.operation, operation)) return false;
         if (!BeanUtils.checkEquals(ap.path, path)) return false;
         return true;
+    }
+    public static void main(String[] args){
+        String template = "read:/public/${user}/***";
+        AuthorizationPath at = new AuthorizationPath(template);
+        System.out.println(at);
     }
 }

@@ -3,18 +3,27 @@
        A sample client configuration. Note that since this is OAuth 2, this mostly is a configuration for that
        The configuration for SciTokens that allows for scopes and such lives on the server and must be done
        by the server administrators.
+
+       This is from the OA4MP client configuration file format. The comments in this file are more than enough
+       to get you up and running. The full reference is
+
+       http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/config-index.xhtml
     -->
     <!--
         You should set the name to something you want human readable, note that this must be set in the
-        web.xml as well
+        web.xml as well, which is explained here:
+        http://grid.ncsa.illinois.edu/myproxy/oauth/client/configuration/configuration-file.xhtml
     -->
     <client name="oa4mp:scitokens.fileStore">
+        <!--
+           For logging, all you really need is a path to the log file.
+        -->
         <logging
-              logFileName="/var/log/tomcat/scitokens-client.xml"
-              logName="oa2-client"
+              logFileName="/path/to/logfile"
+              logName="scitokens-client"
               logSize="100000"
               logFileCount="2"
-              debug="true"/>
+              />
         <!--
           The identifier that is given to you and the corresponding secret go here.
         -->
@@ -38,7 +47,8 @@
 
         <!--
             The callback you used when registering this client. Note that this MUST match exactly down
-            to case or the OAuth spec. requires that the request be rejected.
+            to case (so you cannot for example, add parameters dynamically) or the OAuth spec. requires that the
+            request be rejected. 
         -->
          <callbackUri>https://address.of.this.client/scitokens-client/ready</callbackUri>
         <!--
