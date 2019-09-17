@@ -12,8 +12,8 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  * on 9/25/17 at  1:06 PM
  */
 public class STBootstrapper extends OA2Bootstrapper {
-  /*  public static final String ST_CONFIG_FILE_KEY = "oa4mp:scitokens.server.config.file";
-    public static final String ST_CONFIG_NAME_KEY = "oa4mp:scitokens.server.config.name";
+    public static final String ST_CONFIG_FILE_KEY = "scitokens:server.config.file";
+    public static final String ST_CONFIG_NAME_KEY = "scitokens:server.config.name";
 
     @Override
     public String getOa4mpConfigFileKey() {
@@ -24,7 +24,7 @@ public class STBootstrapper extends OA2Bootstrapper {
     public String getOa4mpConfigNameKey() {
         return ST_CONFIG_NAME_KEY;
     }
-*/
+
     @Override
     public ConfigurationLoader getConfigurationLoader(ConfigurationNode node) throws MyConfigurationException {
         return new STLoader(node);

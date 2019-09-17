@@ -6,7 +6,7 @@
          version="2.5">
 
     <display-name>The SciTokens OAuth Service</display-name>
-\
+
 
     <servlet>
         <servlet-name>accessToken</servlet-name>
@@ -168,14 +168,14 @@
 
 <!--
     <context-param>
-        <param-name>oa4mp:scitokens.server.config.file</param-name>
+        <param-name>scitokens:server.config.file</param-name>
         <param-value>/home/ncsa/dev/csd/config/servers.xml</param-value>
     </context-param>
 -->
 
 
     <context-param>
-        <param-name>oa4mp:oauth2.server.config.name</param-name>
+        <param-name>scitokens:server.config.name</param-name>
         <param-value>scitokens-server</param-value>
     </context-param>
 

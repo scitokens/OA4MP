@@ -31,41 +31,38 @@
         <servlet-name>ready</servlet-name>
         <url-pattern>/ready</url-pattern>
     </servlet-mapping>
-<!--
-    <servlet>
-           <servlet-name>startRequest</servlet-name>
-           <servlet-class>edu.uiuc.ncsa.oa4mp.oauth2.client.servlet.OA2StartRequest</servlet-class>
-           <load-on-startup>1</load-on-startup>
-       </servlet>
+    <!--
+        <servlet>
+               <servlet-name>startRequest</servlet-name>
+               <servlet-class>edu.uiuc.ncsa.oa4mp.oauth2.client.servlet.OA2StartRequest</servlet-class>
+               <load-on-startup>1</load-on-startup>
+           </servlet>
 
-       <servlet-mapping>
-           <servlet-name>startRequest</servlet-name>
-           <url-pattern>/startRequest</url-pattern>
-       </servlet-mapping>
+           <servlet-mapping>
+               <servlet-name>startRequest</servlet-name>
+               <url-pattern>/startRequest</url-pattern>
+           </servlet-mapping>
 
 
-       <servlet>
-           <servlet-name>ready</servlet-name>
-           <servlet-class>edu.uiuc.ncsa.oa4mp.oauth2.client.servlet.OA2ReadyServlet</servlet-class>
-           <load-on-startup>1</load-on-startup>
-       </servlet>
+           <servlet>
+               <servlet-name>ready</servlet-name>
+               <servlet-class>edu.uiuc.ncsa.oa4mp.oauth2.client.servlet.OA2ReadyServlet</servlet-class>
+               <load-on-startup>1</load-on-startup>
+           </servlet>
 
-       <servlet-mapping>
-           <servlet-name>ready</servlet-name>
-           <url-pattern>/ready</url-pattern>
-       </servlet-mapping>
-    -->
+           <servlet-mapping>
+               <servlet-name>ready</servlet-name>
+               <url-pattern>/ready</url-pattern>
+           </servlet-mapping>
+        -->
     <welcome-file-list>
         <welcome-file>
             index.html <!--default file to be displayed at http://foo.org/client-->
         </welcome-file>
 
     </welcome-file-list>
-<!--    <listener>
-        <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.client.loader.ClientBootstrapper</listener-class>
-    </listener>-->
     <listener>
-        <listener-class>edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientBootstrapper</listener-class>
+        <listener-class>org.scitokens.client.STClientBootstrapper</listener-class>
     </listener>
 
     <!--
@@ -96,20 +93,20 @@
 
     <!--
        New and improved way to specify the XML-based configuration file
+
     -->
     <!--
     <context-param>
-        <param-name>oa4mp:oauth2.client.config.file</param-name>
+        <param-name>scitokens:client.config.file</param-name>
         <param-value>/path/to/config-file.xml</param-value>
     </context-param>
-    -->
-
+     -->
 
     <!-- (Optional) name of the configuration within the file to load -->
-    <context-param>
-        <param-name>oa4mp:oauth2.client.config.name</param-name>
-        <param-value>scitokens-client</param-value>
-    </context-param>
 
+   <context-param>
+       <param-name>scitokens:client.config.name</param-name>
+       <param-value>scitokens-client</param-value>
+   </context-param>
 </web-app>
 
