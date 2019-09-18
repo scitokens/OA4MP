@@ -1,6 +1,7 @@
 package org.scitokens.loader;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
@@ -60,7 +61,8 @@ public class STSE extends OA2SE {
                 boolean utilServletEnabled,
                 boolean isATasSTEnabled,
                 boolean isOIDCEnabled,
-                Provider<JSONStore> jsonStoreProvider) {
+                Provider<JSONStore> jsonStoreProvider,
+                CMConfigs cmConfigs) {
         super(logger,
                 tsp,
                 csp,
@@ -90,7 +92,8 @@ public class STSE extends OA2SE {
                 jsonWebKeys, issuer,
                 utilServletEnabled,
                 isOIDCEnabled,
-                jsonStoreProvider);
+                jsonStoreProvider,
+                cmConfigs);
 
         this.isATasSTEnabled = isATasSTEnabled;
     }
