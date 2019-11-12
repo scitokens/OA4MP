@@ -109,12 +109,12 @@
 <p>To give read access to everything in the /public directory and below it.
     You may also use variables such as</p>
 <ul>
-    <li>${user} = the user's name at logon. This is taken from the claim given above.</li>
-    <li>${group} = IF there is group information associated with this user (e.g. in LDAP) then you may
+    <li>&#x24;{user} = the user's name at logon. This is taken from the claim given above.</li>
+    <li>&#x24;{group} = IF there is group information associated with this user (e.g. in LDAP) then you may
     access the name of the group here. </li>
 </ul>
 <p>For instance if a user is in the groups <code>admin,users,gravity</code> then a permission template might look
-like <code>read:/home/${user}/${group}/**</code> and if user bob could make the following specific request
+like <code>read:/home/&#x24;{user}/&#x24;{group}/**</code> and if user bob could make the following specific request
 against this template: <code>read:/home/bob/gravity/data/raw.hdf</code></p>
 </body>
 </html>
