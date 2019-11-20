@@ -22,12 +22,12 @@
         <dependency>
                  <groupId>edu.uiuc.ncsa.myproxy</groupId>
                  <artifactId>oa4mp-client-api</artifactId>
-                 <version>4.2-SNAPSHOT</version>
+                 <version>4.3</version>
              </dependency>
              <dependency>
                  <groupId>edu.uiuc.ncsa.myproxy</groupId>
                  <artifactId>oa4mp-client-oauth2</artifactId>
-                 <version>4.2-SNAPSHOT</version>
+                 <version>4.3</version>
                  <type>war</type>
                  <scope>runtime</scope>
              </dependency>
@@ -40,7 +40,7 @@
              <dependency>
                  <groupId>edu.uiuc.ncsa.myproxy</groupId>
                  <artifactId>oa4mp-client-loader-oauth2</artifactId>
-                 <version>4.2-SNAPSHOT</version>
+                 <version>4.3</version>
              </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>4.2-SNAPSHOT</version>
+            <version>4.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -59,28 +59,28 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.2-SNAPSHOT</version>
+            <version>4.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-servlet</artifactId>
-            <version>4.2-SNAPSHOT</version>
+            <version>4.3</version>
         </dependency>
 
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>4.2-SNAPSHOT</version>
+            <version>4.3</version>
         </dependency>
 
 
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-2.0</artifactId>
-            <version>4.2-SNAPSHOT</version>
+            <version>4.3</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
