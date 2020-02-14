@@ -1,11 +1,10 @@
-package org.scitokens.util.claims;
+package org.scitokens.util.functor;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JMetaMetaFunctor;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.scitokens.util.STClaimsProcessor;
 
 import java.util.Collection;
 import java.util.Map;

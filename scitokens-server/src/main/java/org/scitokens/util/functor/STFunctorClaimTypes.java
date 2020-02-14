@@ -1,4 +1,4 @@
-package org.scitokens.util.claims;
+package org.scitokens.util.functor;
 
 import edu.uiuc.ncsa.security.util.functor.FunctorType;
 

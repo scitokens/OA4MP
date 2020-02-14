@@ -27,7 +27,7 @@ public class STTransaction extends OA2ServiceTransaction {
      * that contains a signature, but we only store the actual claims.
      * @return
      */
-
+    @Override
     public JSONObject getClaims() {
         if(claims == null){
             claims = new JSONObject();

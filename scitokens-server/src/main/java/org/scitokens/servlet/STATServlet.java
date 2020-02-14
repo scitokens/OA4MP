@@ -26,6 +26,8 @@ import org.apache.http.HttpStatus;
 import org.scitokens.loader.STSE;
 import org.scitokens.util.*;
 import org.scitokens.util.claims.*;
+import org.scitokens.util.functor.STClaimsProcessor;
+import org.scitokens.util.functor.STFunctorFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

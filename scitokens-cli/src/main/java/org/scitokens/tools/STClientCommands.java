@@ -1,7 +1,7 @@
 package org.scitokens.tools;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
-import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2TestCommands;
+import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CLCCommands;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -19,7 +19,7 @@ import org.scitokens.util.SciTokensUtil;
  * <p>Created by Jeff Gaynor<br>
  * on 12/11/17 at  10:31 AM
  */
-public class STClientCommands extends OA2TestCommands{
+public class STClientCommands extends OA2CLCCommands {
     public STClientCommands(MyLoggingFacade logger, ClientEnvironment ce) {
         super(logger, ce);
     }

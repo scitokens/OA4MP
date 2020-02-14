@@ -42,7 +42,7 @@ public class TemplateResolver {
                     String[] parts = scope.split(":");
                     if (1 == parts.length) {
                         //throw new NFWException("Error: no operation is included with this scope request");
-                        ServletDebugUtil.dbg(this, "No operation found for scope request \"" + scope + "\", with audience = \"" + audience + "\"");
+                        ServletDebugUtil.trace(this, "No operation found for scope request \"" + scope + "\", with audience = \"" + audience + "\"");
                         return returnedScopes;
                     }
                     String operation = parts[0];
@@ -91,7 +91,7 @@ public class TemplateResolver {
      * @return
      */
     public boolean check(String template, String target) {
-        DebugUtil.dbg(this, "testing " + target + " against template " + template);
+        DebugUtil.trace(this, "testing " + target + " against template " + template);
         ArrayList<String> tests = new ArrayList<>();
         boolean un = template.contains("${" + ST_USER_NAME + "}");
         if (template.contains("${" + ST_GROUP_NAME + "}")) {
@@ -106,7 +106,7 @@ public class TemplateResolver {
                         group.put(ST_USER_NAME, username);
                     }
                     String replacedString = TemplateUtil.replaceAll(template, group);
-                    DebugUtil.dbg(this, template + " --> " + replacedString);
+                    DebugUtil.trace(this, template + " --> " + replacedString);
                     tests.add(replacedString);
                 }
             }
@@ -125,7 +125,7 @@ public class TemplateResolver {
             // no groups, single
         }
         for (String template1 : tests) {
-            DebugUtil.dbg(this, "   testing: " + template1 + ", username = " + username);
+            DebugUtil.trace(this, "   testing: " + template1 + ", username = " + username);
             if (template1.endsWith("/**")) {
                 // implies sub paths, not substrings, so /foo/** implies /foo, /foo/ and /foo/baz are ok,
                 // but /foobar is not
@@ -137,12 +137,12 @@ public class TemplateResolver {
                 }
                 noStars = template1.substring(0, template1.length() - 2); // keep trailing slash
                 if (r.startsWith(noStars)) {
-                    DebugUtil.dbg(this, "   testing: returning " + target);
+                    DebugUtil.trace(this, "   testing: returning " + target);
                     return true;
                 }
             } else {
                 if (template1.equals(target.toString())) {
-                    DebugUtil.dbg(this, "   testing: returning " + target);
+                    DebugUtil.trace(this, "   testing: returning " + target);
                     return true;
                 }
             }

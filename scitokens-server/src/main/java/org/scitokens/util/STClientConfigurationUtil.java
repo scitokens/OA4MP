@@ -1,6 +1,6 @@
 package org.scitokens.util;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.scitokens.util.claims.AuthorizationTemplates;
@@ -9,7 +9,7 @@ import org.scitokens.util.claims.AuthorizationTemplates;
  * <p>Created by Jeff Gaynor<br>
  * on 8/3/18 at  8:43 AM
  */
-public class STClientConfigurationUtil extends OA2ClientConfigurationUtil {
+public class STClientConfigurationUtil extends OA2ClientFunctorScriptsUtil {
     public static String SCI_TOKENS_KEY = "scitokens";
     public static String AUTHORIZATION_TEMPLATES_KEY = "templates";
     public static String VERSION_1_0 = "1.0";

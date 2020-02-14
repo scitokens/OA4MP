@@ -7,8 +7,8 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.scitokens.util.PermissionResolver;
-import org.scitokens.util.STClaimsProcessor;
-import org.scitokens.util.claims.STFunctorClaimTypes;
+import org.scitokens.util.functor.STClaimsProcessor;
+import org.scitokens.util.functor.STFunctorClaimTypes;
 
 import java.net.URI;
 import java.util.HashMap;

@@ -38,25 +38,25 @@ public class PermissionResolver {
     }
 
     protected URI processNew(URI request) {
-        DebugUtil.dbg(this, "processNew: validating request");
+        DebugUtil.trace(this, "processNew: validating request");
 
         validate(request);
-        DebugUtil.dbg(this, "processNew: request valid");
+        DebugUtil.trace(this, "processNew: request valid");
 
         String query = request.getQuery();
         URI fragment = URI.create(request.getFragment());
         String permission = request.getQuery();
-        DebugUtil.dbg(this, "processNew: template size = " + templates.size());
+        DebugUtil.trace(this, "processNew: template size = " + templates.size());
 
         for (int i = 0; i < templates.size(); i++) {
             JSONObject json = templates.getJSONObject(i);
-            DebugUtil.dbg(this, "processNew: permission = " + permission);
-            DebugUtil.dbg(this, "processNew: template  = " + json);
+            DebugUtil.trace(this, "processNew: permission = " + permission);
+            DebugUtil.trace(this, "processNew: template  = " + json);
 
             if (json.containsKey(permission)) {
 
                 String tempP = json.getString(permission);
-                DebugUtil.dbg(this, "processNew: tempP start with? " + fragment.getScheme());
+                DebugUtil.trace(this, "processNew: tempP start with? " + fragment.getScheme());
                 if (tempP.startsWith(fragment.getScheme() + ":")) {
                     URI out = check(tempP, fragment);
                     if (out != null) {
@@ -64,7 +64,7 @@ public class PermissionResolver {
                     }
                 }
             }else{
-                DebugUtil.dbg(this, "processNew: permission NOT FOUND");
+                DebugUtil.trace(this, "processNew: permission NOT FOUND");
 
             }
         }
@@ -84,10 +84,10 @@ public class PermissionResolver {
         // old otken = what is used currently in SciTokens and is of the form e.g. read:path
         // This is converted to a standard new request with an implicit request for file:///path
         // so that our permission machinery works on it.
-        DebugUtil.dbg(this, " resolve: originial request=\"" + request + "\"");
+        DebugUtil.trace(this, " resolve: originial request=\"" + request + "\"");
         if (isOldToken(request)) {
             request = URI.create(ST_SCHEME + ":/" + ST_PATH + "?" + request.getScheme() + "#file://" + request.getPath());
-            DebugUtil.dbg(this, " resolve: converted to \"" + request + "\"");
+            DebugUtil.trace(this, " resolve: converted to \"" + request + "\"");
         }
         return processNew(request);
     }
@@ -98,7 +98,7 @@ public class PermissionResolver {
     }
 
     protected URI check(String template, URI resource) {
-        DebugUtil.dbg(this,"testing " + resource + " against template " + template);
+        DebugUtil.trace(this,"testing " + resource + " against template " + template);
         ArrayList<String> tests = new ArrayList<>();
         boolean un = template.contains("${" + ST_USER_NAME + "}");
         if (template.contains("${" + ST_GROUP_NAME + "}")) {
@@ -113,7 +113,7 @@ public class PermissionResolver {
                     group.put(ST_USER_NAME, username);
                 }
                 String replacedString = TemplateUtil.replaceAll(template, group);
-                DebugUtil.dbg(this, template + " --> " + replacedString);
+                DebugUtil.trace(this, template + " --> " + replacedString);
                 tests.add(replacedString);
             }
 
@@ -129,7 +129,7 @@ public class PermissionResolver {
             // no groups, single
         }
         for (String template1 : tests) {
-            DebugUtil.dbg(this, "   testing: " + template1);
+            DebugUtil.trace(this, "   testing: " + template1);
             if (template1.endsWith("/**")) {
                 // implies sub paths, not substrings, so /foo/** implies /foo, /foo/ and /foo/baz are ok,
                 // but /foobar is not
@@ -141,12 +141,12 @@ public class PermissionResolver {
                 }
                 noStars = template1.substring(0, template1.length() - 2); // keep trailing slash
                 if (r.startsWith(noStars)) {
-                    DebugUtil.dbg(this, "   testing: returning " + resource);
+                    DebugUtil.trace(this, "   testing: returning " + resource);
                     return resource;
                 }
             } else {
                 if (template1.equals(resource.toString())) {
-                    DebugUtil.dbg(this, "   testing: returning " + resource);
+                    DebugUtil.trace(this, "   testing: returning " + resource);
                     return resource;
                 }
             }

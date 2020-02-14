@@ -1,6 +1,6 @@
-package org.scitokens.util.claims;
+package org.scitokens.util.functor;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimFunctor;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.ClaimFunctor;
 import net.sf.json.JSONArray;
 
 import java.util.Map;
