@@ -7,11 +7,11 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims;
  * on 1/22/18 at  4:06 PM
  */
 public interface SciTokensClaims extends OA2Claims {
-    public static String ST_SCOPE = "scope";
-    public static String ST_CLIENT_IDENTIFIER = "cid";
-    public static String CLAIM_OPERATION_WRITE = "write";
-    public static String CLAIM_OPERATION_READ = "read";
-    public static String CLAIM_OPERATION_QUEUE = "queue";
-    public static String CLAIM_OPERATION_EXECUTE = "execute";
+    String ST_SCOPE = "scope";
+    String ST_CLIENT_IDENTIFIER = "cid";
+    String CLAIM_OPERATION_WRITE = "write";
+    String CLAIM_OPERATION_READ = "read";
+    String CLAIM_OPERATION_QUEUE = "queue";
+    String CLAIM_OPERATION_EXECUTE = "execute";
 
 }

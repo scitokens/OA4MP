@@ -1,6 +1,6 @@
 package org.scitokens.test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientConfigurationUtil;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.util.TestBase;
@@ -68,7 +68,7 @@ public class ConfigurationTest extends TestBase {
         JSONObject cfg = getTestConfig();
         STClient client = new STClient(BasicIdentifier.newID("test:/id/" + System.currentTimeMillis()));
         client.setConfig(cfg);
-        JSONArray array  = OA2ClientConfigurationUtil.getClaimSourceConfigurations(cfg);
+        JSONArray array  = OA2ClientFunctorScriptsUtil.getClaimSourceConfigurations(cfg);
         assert array.size() == 1;
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
         client.setLdaps(ldapConfigurationUtil.fromJSON(array));

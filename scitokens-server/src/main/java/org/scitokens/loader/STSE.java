@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.MyProxyFacadeProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
+import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
@@ -62,7 +63,8 @@ public class STSE extends OA2SE {
                 boolean isATasSTEnabled,
                 boolean isOIDCEnabled,
                 Provider<JSONStore> jsonStoreProvider,
-                CMConfigs cmConfigs) {
+                CMConfigs cmConfigs,
+                QDLEnvironment qdlEnvironment) {
         super(logger,
                 tsp,
                 csp,
@@ -93,7 +95,8 @@ public class STSE extends OA2SE {
                 utilServletEnabled,
                 isOIDCEnabled,
                 jsonStoreProvider,
-                cmConfigs);
+                cmConfigs,
+                qdlEnvironment);
 
         this.isATasSTEnabled = isATasSTEnabled;
     }

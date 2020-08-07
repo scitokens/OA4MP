@@ -1,6 +1,6 @@
 package org.scitokens.util.functor;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.OA2FunctorFactory;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

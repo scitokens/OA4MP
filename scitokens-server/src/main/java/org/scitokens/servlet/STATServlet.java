@@ -197,7 +197,7 @@ public class STATServlet extends OA2ATServlet implements TokenExchangeConstants 
         }
         /*
         These can come as multiple space delimited string and as multiple parameters, so it is possible to get
-        arrays of arrays of these and they have to be regularlized to a single list for processing.
+        arrays of arrays of these and they have to be regularized to a single list for processing.
          */
         Collection<String> audience = convertToList(request, AUDIENCE);
         Collection<String> scopes = convertToList(request, OA2Constants.SCOPE);

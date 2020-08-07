@@ -11,7 +11,7 @@
     <artifactId>scitokens-java</artifactId>
     <version>1.1-SNAPSHOT</version>
     <name>Parent module for SciTokens.</name>
-    <packaging>pom</packaging>
+    <packaging>pom</packaging>        DebugUtil.dbg(
     <description>SciTokens Java library.</description>
     <url>http://scitokens.org</url>
     <scm>
