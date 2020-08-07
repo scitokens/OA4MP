@@ -3,6 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1479837.svg)](https://doi.org/10.5281/zenodo.1479837)
 [![Build Status](https://travis-ci.org/scitokens/scitokens-java.svg?branch=master)](https://travis-ci.org/scitokens/scitokens-java)
 [![Javadocs](https://www.javadoc.io/badge/org.scitokens/scitokens-client.svg)](https://www.javadoc.io/doc/org.scitokens/scitokens-client)
+[![NSF-1738962](https://img.shields.io/badge/NSF-1738962-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1738962)
 
 ## Prerequisites
 
