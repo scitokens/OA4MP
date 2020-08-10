@@ -64,7 +64,9 @@ public class STSE extends OA2SE {
                 boolean isOIDCEnabled,
                 Provider<JSONStore> jsonStoreProvider,
                 CMConfigs cmConfigs,
-                QDLEnvironment qdlEnvironment) {
+                QDLEnvironment qdlEnvironment, boolean isScitokenEnabled,
+                boolean rfc8693Enabled,
+                boolean wlcgEnabled) {
         super(logger,
                 tsp,
                 csp,
@@ -96,7 +98,8 @@ public class STSE extends OA2SE {
                 isOIDCEnabled,
                 jsonStoreProvider,
                 cmConfigs,
-                qdlEnvironment);
+                qdlEnvironment,
+                isScitokenEnabled, rfc8693Enabled, wlcgEnabled);
 
         this.isATasSTEnabled = isATasSTEnabled;
     }

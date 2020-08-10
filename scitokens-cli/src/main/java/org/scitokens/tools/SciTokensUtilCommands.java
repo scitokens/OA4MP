@@ -388,14 +388,14 @@ public class SciTokensUtilCommands extends CommonCommands {
     }
 
 
-    protected boolean getBooleanInput(String prompt) {
+    protected boolean getBooleanInput(String prompt) throws IOException {
         String x = getInput(prompt, "y");
         if (x.equalsIgnoreCase("y") || x.equalsIgnoreCase("yes") || x.equalsIgnoreCase("true")) return true;
         return false;
     }
 
     protected String getInput(String prompt) {
-        sayi2(prompt + ":");
+        say2(prompt + ":");
         String inLine = readline();
         if (isEmpty(inLine)) {
             return null; // no input. User hit a return

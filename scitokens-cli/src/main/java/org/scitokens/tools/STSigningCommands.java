@@ -54,14 +54,14 @@ public class STSigningCommands extends SigningCommands {
                     if (!publicKeyFile.isFile()) {
                         sayi("Sorry, but you must supply the name of the file as well (or type 'exit' to exit");
                     } else {
-                        sayi2("The file you gave exists, do you want to over write it? [y/n]");
+                        say2("The file you gave exists, do you want to over write it? [y/n]");
                         retry = !isOk(readline());
                     }
                 } else {
                     retry = false;
                 }
             }
-            sayi2("create a new set of JSON web keys?[y/n]");
+            say2("create a new set of JSON web keys?[y/n]");
             if (!isOk(readline())) {
                 say("create cancelled.");
                 return;
